@@ -18,7 +18,7 @@ public class Starter {
 	}
 
 	protected void loadMySystem() throws Exception {
-		String[] equinoxArgs = new String[]{"-console"};//(1)
+		String[] equinoxArgs = new String[]{"-console","-clean"};//(1)
 		context = EclipseStarter.startup(equinoxArgs, null);
 		System.out.println("*** Starter osgi.bundlestore=" + 
 							context.getProperty("osgi.bundlestore") );

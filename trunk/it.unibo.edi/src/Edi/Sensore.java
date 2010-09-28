@@ -1,7 +1,7 @@
 package Edi;
 
 	import it.unibo.platform.medcl.*;
-	import it.unibo.platform.lindaLike.IMessage;
+import it.unibo.platform.lindaLike.IMessage;
 	
 
 public class  Sensore extends Subject{
@@ -37,6 +37,6 @@ public class  Sensore extends Subject{
 	 sensoreEmit() ;
  	 
 
-	}catch( Exception e ){}
+	}catch( Exception e ){System.err.println("Errore in Sensore");e.printStackTrace();}
 	}
 }

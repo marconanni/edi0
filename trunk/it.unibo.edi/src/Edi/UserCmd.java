@@ -1,7 +1,7 @@
 package Edi;
 
 	import it.unibo.platform.medcl.*;
-	import it.unibo.platform.lindaLike.IMessage;
+import it.unibo.platform.lindaLike.IMessage;
 	
 
 public class  UserCmd extends Subject{
@@ -16,7 +16,7 @@ public class  UserCmd extends Subject{
 	public void evalResponse(IAcquireDemandReply answer) throws Exception{
 		while( !answer.demandReplyAvailable() ) {
 			showMsg( "no response yet received ... " );
-			Thread.sleep(1);
+			Thread.sleep(100);
 		}
 		showMsg( "received " + answer.acquireDemandReply().msgContent());	
 	}
@@ -38,14 +38,15 @@ public class  UserCmd extends Subject{
 	try{
  		
 //operation userCmd
-	IAcquireDemandReply m = userCmdDemand() ;
-	evalResponse( m );
+		// TODO decommentare invio richiesta.
+//	IAcquireDemandReply m = userCmdDemand() ;
+//	evalResponse( m );
 	 
 
 
 
 
 
-	}catch( Exception e ){}
+	}catch( Exception e ){System.err.println("Errore in UserCmd");e.printStackTrace();}
 	}
 }

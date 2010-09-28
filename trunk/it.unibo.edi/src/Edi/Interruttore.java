@@ -1,7 +1,7 @@
 package Edi;
 
 	import it.unibo.platform.medcl.*;
-	import it.unibo.platform.lindaLike.IMessage;
+import it.unibo.platform.lindaLike.IMessage;
 	
 
 public class  Interruttore extends Subject{
@@ -38,6 +38,6 @@ public class  Interruttore extends Subject{
 	 
 
 
-	}catch( Exception e ){}
+	}catch( Exception e ){System.err.println("Errore ricezione messaggio");e.printStackTrace();}
 	}
 }
