@@ -11,7 +11,7 @@ package Edi.messaggi;
  * considerazione e quindi è una buona scelta metterlo a null o a 0;
  */
 
-public abstract class ComandoUserCmd implements IComandoUserCmd {
+public class ComandoUserCmd implements IComandoUserCmd {
 	
 	private ComandiUserCmd comando;
 	private String idElettrodomestico;
