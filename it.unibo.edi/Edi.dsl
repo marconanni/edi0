@@ -12,6 +12,10 @@ userCmd demand comandoUserCmd to scontrol;
 
 scontrol grant comandoUserCmd;
 
+scontrol ask status to userCmd;
+
+userCmd accept status;
+
 scontrol ask comandoScontrol to interruttore;
 
 interruttore accept comandoScontrol;

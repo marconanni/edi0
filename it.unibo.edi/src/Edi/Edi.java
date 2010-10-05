@@ -24,7 +24,7 @@ private Interruttore interruttore;
 	}
 
 	protected void configure(){
-		userCmd = UserCmd.getInstance();
+		userCmd = (UserCmd) UserCmd.getInstance();
 		userCmd.setName("Subject-userCmd");
 		scontrol = new Scontrol();
 		scontrol.setName("Subject-scontrol");
