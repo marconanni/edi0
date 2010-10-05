@@ -2,6 +2,9 @@
 	Main
  ================================== */
 package Edi;
+
+import Edi.userCmd.UserCmd;
+
 public  class Edi{
 
 private UserCmd userCmd;
@@ -21,7 +24,7 @@ private Interruttore interruttore;
 	}
 
 	protected void configure(){
-		userCmd = new UserCmd();
+		userCmd = UserCmd.getInstance();
 		userCmd.setName("Subject-userCmd");
 		scontrol = new Scontrol();
 		scontrol.setName("Subject-scontrol");
