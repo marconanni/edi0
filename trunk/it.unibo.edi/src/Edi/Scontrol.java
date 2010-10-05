@@ -1,7 +1,7 @@
 package Edi;
 
 	import it.unibo.platform.medcl.*;
-	import it.unibo.platform.lindaLike.IMessage;
+import it.unibo.platform.lindaLike.IMessage;
 	
 
 public class  Scontrol extends Subject{
@@ -23,13 +23,23 @@ public class  Scontrol extends Subject{
 	}
 	
 	
-	protected void scontrolAsk() throws Exception{
+	protected void scontrolAskStatus() throws Exception{
+		
+	IAcquireAskReply answer = support.ask( "scontrol", "status", M, "userCmd");
+	showMsg(  "has asked ... " + "status" );
+	while( !answer.askReplyAvailable() ) {
+		showMsg( "no ask yet received ... " );
+		Thread.sleep(100);
+	}
+	showMsg( "ask terminated " );
+		}
+	protected void scontrolAskComandoScontrol() throws Exception{
 		
 	IAcquireAskReply answer = support.ask( "scontrol", "comandoScontrol", M, "interruttore");
 	showMsg(  "has asked ... " + "comandoScontrol" );
 	while( !answer.askReplyAvailable() ) {
 		showMsg( "no ask yet received ... " );
-		Thread.sleep(1);
+		Thread.sleep(100);
 	}
 	showMsg( "ask terminated " );
 		}
@@ -54,19 +64,21 @@ public class  Scontrol extends Subject{
 	protected void doJob(){
 	try{
  		
-//operation scontrol
+//operation scontrol : per le prove commenta e decommenta le comunicazioni di interesse
 
-// TODO decommentare ricezione request da usercmd
 //	IMessageAndContext m = scontrolGrant();
 //	//showMessage(  m.getReceivedMessage() ) ;
 //	evalRequest( m  );
-	 // TODO: non va l'invio del comando all'interruttore: tuprolog da un'eccezione di malformed goal 
-//	 scontrolAsk() ;
+//	 
+	 scontrolAskStatus() ;
+//	 
+//
+//	 scontrolAskComandoScontrol() ;
 	 
 
 
-	IMessage m2 = scontrolSense();
-	showMessage("ricevuto messaggio", m2 ) ;
+//	IMessage m2 = scontrolSense();
+	//showMessage( m ) ;
 	 
 	}catch( Exception e ){System.err.println("Errore in Scontrol");e.printStackTrace();}
 	}
