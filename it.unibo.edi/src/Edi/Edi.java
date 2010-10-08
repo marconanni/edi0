@@ -3,6 +3,7 @@
  ================================== */
 package Edi;
 
+import Edi.elettrodomestico.Interruttore;
 import Edi.userCmd.UserCmd;
 
 public  class Edi{
@@ -24,6 +25,7 @@ private Interruttore interruttore;
 	}
 
 	protected void configure(){
+		// TODO : sistemare la configurazione caricandola da un file di configurazione.
 		userCmd = (UserCmd) UserCmd.getInstance();
 		userCmd.setName("Subject-userCmd");
 		scontrol = new Scontrol();
