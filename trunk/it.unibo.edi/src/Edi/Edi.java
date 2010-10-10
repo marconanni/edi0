@@ -4,6 +4,7 @@
 package Edi;
 
 import Edi.elettrodomestico.Interruttore;
+import Edi.elettrodomestico.Sensore;
 import Edi.userCmd.UserCmd;
 
 public  class Edi{
