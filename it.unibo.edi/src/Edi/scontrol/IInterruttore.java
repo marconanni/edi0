@@ -1,4 +1,6 @@
-package Edi.elettrodomestico;
+package Edi.scontrol;
+
+import Edi.elettrodomestico.IElettrodomestico;
 
 /**
  * 
@@ -33,5 +35,33 @@ public interface IInterruttore {
 	 * spenge l'interruttore e l'elettrodomestico collegato
 	 */
 	public void turnOff();
+	
+	/**
+	 * 
+	 * @return true se l'interruttore è collegato ad un elettrodomestico
+	 */
+	public boolean isCollegato();
+	
+	/**
+	 * 
+	 * @return l'identificativo dell'elettrodomestico
+	 */
+	public String getId();
+	
+	/**
+	 * 
+	 * @return l'identificativo dell'elettrodomestico collegato all'interruttore
+	 */
+	public String getIdElettrodomesticoCollegato();
+	
+	
+	/**
+	 * metodo che consente di impostare l'elettrodomestico attualemte collegato all'interruttore
+	 * @param elettrodomesticoCollegato l'elettrodomestico da collegare all'interruttore 8 quello al quale invierà
+	 * i comandi di accensione e soegnimento.
+	 */
+	public void setElettrodomesticoCollegato(IElettrodomestico elettrodomesticoCollegato) ;
+	
+	
 
 }
