@@ -3,8 +3,9 @@
  ================================== */
 package Edi;
 
-import Edi.elettrodomestico.Interruttore;
 import Edi.elettrodomestico.Sensore;
+import Edi.scontrol.Interruttore;
+import Edi.scontrol.Scontrol;
 import Edi.userCmd.UserCmd;
 
 public  class Edi{
