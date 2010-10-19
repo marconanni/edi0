@@ -1,5 +1,7 @@
 package Edi.elettrodomestico;
 
+import java.util.Date;
+
 /**
  * 
  * @author Marco
@@ -15,28 +17,33 @@ public class RappresentazioneElettrodomestico implements IRappresentazioneElettr
 	
 	private String id;
 	private StatoElettrodomestico stato;
-	private int consumoAttuale;
+	private int consumo;
 	private String idInterruttore;
+	private Date oraAccensione;
 	
 	/**
 	 * 
 	 * @param id : una stringa di al massimo 10 caratteri che identifica univocamente l'elettrodomestico
 	 * @param stato : lo stato dell'elettrodomestico
-	 * @param consumoAttuale: il consumo attale dell'elettrodomestico ( se acceso l'ultimo consumo registrato, se spento 0)
+	 * @param consumoAttuale: il consumo attuale dell'elettrodomestico ( se acceso  l'ultimo consumo registrato, se spento 0)
+	 * 						se l'elettrodomestico è disattivato contiene l'ultimo dato di consumo ricevuto
 	 * @param idInterruttore : l'identificativo dell'interruttore al quale l'elettrodomestcico è collegato
+	 * @param oraAccensione: l'ora dell'ultima accensione dell'elettrodomestico
 	 */
 	public RappresentazioneElettrodomestico(String id,
-			StatoElettrodomestico stato, int consumoAttuale,
-			String idInterruttore) {
+			StatoElettrodomestico stato, int consumo,
+			String idInterruttore, Date oraAccensione) {
 		super();
 		this.id = id;
 		this.stato = stato;
-		this.consumoAttuale = consumoAttuale;
+		this.consumo = consumo;
 		this.idInterruttore = idInterruttore;
+		this.oraAccensione = oraAccensione;
 	}
+	
 
 
-	/* (non-Javadoc)
+	/**
 	 * @see Edi.elettrodomestico.IRappresentazioneElettrodomestico#getStato()
 	 */
 	public StatoElettrodomestico getStato() {
@@ -44,7 +51,10 @@ public class RappresentazioneElettrodomestico implements IRappresentazioneElettr
 	}
 
 
-	/* (non-Javadoc)
+	
+
+
+	/**
 	 * @see Edi.elettrodomestico.IRappresentazioneElettrodomestico#setStato(Edi.elettrodomestico.StatoElettrodomestico)
 	 */
 	public void setStato(StatoElettrodomestico stato) {
@@ -52,19 +62,19 @@ public class RappresentazioneElettrodomestico implements IRappresentazioneElettr
 	}
 
 
-	/* (non-Javadoc)
+	/**
 	 * @see Edi.elettrodomestico.IRappresentazioneElettrodomestico#getConsumoAttuale()
 	 */
-	public int getConsumoAttuale() {
-		return consumoAttuale;
+	public int getConsumo() {
+		return consumo;
 	}
 
 
-	/* (non-Javadoc)
+	/**
 	 * @see Edi.elettrodomestico.IRappresentazioneElettrodomestico#setConsumoAttuale(int)
 	 */
-	public void setConsumoAttuale(int consumoAttuale) {
-		this.consumoAttuale = consumoAttuale;
+	public void setConsumo(int consumo) {
+		this.consumo = consumo;
 	}
 
 
@@ -89,6 +99,24 @@ public class RappresentazioneElettrodomestico implements IRappresentazioneElettr
 	 */
 	public String getId() {
 		return id;
+	}
+
+
+
+	/**
+	 * @see Edi.elettrodomestico.IRappresentazioneElettrodomestico#getOraAccensione()
+	 */
+	public Date getOraAccensione() {
+		return oraAccensione;
+	}
+
+
+
+	/**
+	 * @see Edi.elettrodomestico.IRappresentazioneElettrodomestico#setOraAccensione(java.util.Date)
+	 */
+	public void setOraAccensione(Date oraAccensione) {
+		this.oraAccensione = oraAccensione;
 	}
 	
 	
