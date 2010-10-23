@@ -2,8 +2,6 @@ HighLevelMachine Edi;
 
 Request comandoUserCmd;
 
-Invitation comandoScontrol;
-
 Invitation status;
 
 Signal datiSensore;
@@ -15,10 +13,6 @@ scontrol grant comandoUserCmd;
 scontrol ask status to userCmd;
 
 userCmd accept status;
-
-scontrol ask comandoScontrol to interruttore;
-
-interruttore accept comandoScontrol;
 
 sensore emit datiSensore;
 

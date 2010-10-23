@@ -22,11 +22,38 @@ public class  Scontrol extends Subject implements IObserver{
 		private Hashtable<String, IResettableTimer> timers = new Hashtable<String, IResettableTimer>();
 		private int soglia;
 		private long intervalloTimers;
-		
-		//istanze di intetturrori e usercmd messi visto che le due invitation non funzionano.
-		
-		private IUserCmd userCmd;
 		private Hashtable <String, IInterruttore> interruttori = new Hashtable<String, IInterruttore>();
+		
+		//istanza di usercmd messa visto che la invitation non funziona.
+		
+		private UserCmd userCmd;
+		
+		/**
+		 * thread che si mette in ascolto delle richeste di UserCmd, le elabora 
+		 * e invia lo stato attuale come rispsta. E' stato necesario inserirlo
+		 * perchè l'attesa di una request è bloccante, quindi, se fosse stato
+		 * direttamente scontrol a farlo, questi si sarebbe bloccato non potendo
+		 * ricevere i messaggi dai sensori, la cosa, unita al sistema di spegnimento
+		 * preventivo avrebbe creato un gran casino e, probabilmente, causato lo
+		 * spegnimento totale del sistema.
+		 */
+		private Thread ricevitoreComandiUserCmd = new Thread(){
+			public void run(){
+				while (true){
+					try {
+						sleep(100);
+						riceviEdElaboraComandoUserCmd();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					riceviEdElaboraComandoUserCmd();
+				}
+			}
+			
+		};
+		
+		
 		
 		/**
 		 * Restituisce un'istanza di Scontrol configurata mediante i parametri passati.
@@ -37,7 +64,40 @@ public class  Scontrol extends Subject implements IObserver{
 		 * @param intervalloTimers
 		 * @return
 		 */
+		public static Scontrol getInstance(List<IRappresentazioneElettrodomestico> elettrodomestici, int soglia, int intervalloTimers, List<IInterruttore> interruttori){
+			if (instance==null){
+			instance = new Scontrol();
+		}
+		instance.setSoglia(soglia);
+		instance.setIntervalloTimers(intervalloTimers);
+		for (IInterruttore interruttore : interruttori) {
+			instance.interruttori.put(interruttore.getId(), interruttore);
+			
+		}
+		for (IRappresentazioneElettrodomestico elettrodomestico : elettrodomestici) {
+			instance.getElettrodomestici().put(elettrodomestico.getId(), elettrodomestico);
+			// creo un nuovo safety timer, ma non mi registro come listener, lo faccio quando
+			// accendo l'elettrodomestico (e faccio partire il timer)
+			SafetyTimer timer = new SafetyTimer();
+			timer.setIdElettrodomestico(elettrodomestico.getId());
+			timer.setEventTime(instance.getIntervalloTimers());
+			
+			instance.getTimers().put(elettrodomestico.getId(), timer);
+			if (elettrodomestico.getStato()==StatoElettrodomestico.esercizio|| elettrodomestico.getStato()== StatoElettrodomestico.avvio){
+				timer.addObserver(instance);
+				timer.start();
+			}
+		}
+		return instance;
+	}
+
+		public static Scontrol getInstance(List<IRappresentazioneElettrodomestico> elettrodomestici, int soglia, int intervalloTimers, List<IInterruttore> interruttori, UserCmd userCmd){
+			getInstance(elettrodomestici, soglia, intervalloTimers, interruttori);
+			instance.userCmd= userCmd;
+			return instance;
+		}
 		
+
 		/*
 		 * TODO da rifare in base a come decidi di fare la configurazione iniziale e lo startup
 		 */
@@ -134,7 +194,7 @@ public class  Scontrol extends Subject implements IObserver{
 
 
 
-		public void setUserCmd(IUserCmd userCmd) {
+		public void setUserCmd(UserCmd userCmd) {
 			this.userCmd = userCmd;
 		}
 
@@ -147,38 +207,54 @@ public class  Scontrol extends Subject implements IObserver{
 		
 	/**
 	 * provvede ad accendere l'elettrodomestico indicato: chiama turnOn sull' interruttore collegato allleletrodomesticoIndicato
-	 * e cambia lo stato dell'elettrodomestico in avvio.
+	 * imposta l'ora di accensione, cambia lo stato dell'elettrodomestico in avvio 
+	 * e fa partire  e si registra al timer collegato all'interruttore
+	 * 
+	 * 
 	 * NON PROVVEDE AD INVIARE LO STATO AGGIORNATO A SCONTROL
 	 * @param idElettrodomestico: l'id dell'elettrodomestico da accendere
 	 */	
 	public void accendiElettrodomestico (String idElettrodomestico){
 		IRappresentazioneElettrodomestico elettrodomestico = elettrodomestici.get(idElettrodomestico);
+		IResettableTimer timer = timers.get(idElettrodomestico);
 		elettrodomestico.setStato(StatoElettrodomestico.avvio);
+		elettrodomestico.setOraAccensione(new Date());
 		interruttori.get(elettrodomestico.getIdInterruttore()).turnOn();
+		timer.addObserver(this);
+		timer.avvia();
+		
+		
 	}
 	/**
 	 * provvede a spegnere l'elettrodomestico indicato: chiama turnOff sull' interruttore collegato allleletrodomesticoIndicato
-	 * e cambia lo stato dell'elettrodomestico in spento, azzerando il consumo attuale. 
+	 * e cambia lo stato dell'elettrodomestico in spento, azzerando il consumo attuale.
+	 * Infine si deregistra dal timer, in modo che  quando scatta non si riceve l'evento 
 	 * NON PROVVEDE AD INVIARE LO STATO AGGIORNATO A SCONTROL
 	 * @param idElettrodomestico: l'id dell'elettrodomestico da spegnere
 	 */
+	// TODO:  vedi se c'è il modo di forzare la terminazione del thread in modo che l'evento non venga creato del tutto
 	public void spegniElettrodomestico (String idElettrodomestico){
 		IRappresentazioneElettrodomestico elettrodomestico = elettrodomestici.get(idElettrodomestico);
 		elettrodomestico.setStato(StatoElettrodomestico.spento);
 		elettrodomestico.setConsumo(0);
+		elettrodomestico.setOraAccensione(null);
 		interruttori.get(elettrodomestico.getIdInterruttore()).turnOff();
+		timers.get(idElettrodomestico).removeObserver(this);
 	}
 	
 	/**
 	 * provvede a disattivare l'elettrodomestico indicato: chiama turnOff sull'eletrodomesticoIndicato
 	 * e cambia lo stato dell'elettrodomestico in disattivato. 
+	 * Infine si deregistra dal timer, in modo che  quando scatta non si riceve l'evento 
 	 * NON PROVVEDE AD INVIARE LO STATO AGGIORNATO A SCONTROL
 	 * @param idElettrodomestico: l'id dell'elettrodomestico da disattivare
 	 */
+	// TODO:  vedi se c'è il modo di forzare la terminazione del thread in modo che l'evento non venga creato del tutto
 	private void disattivaElettrodomestico (String idElettrodomestico){
 		IRappresentazioneElettrodomestico elettrodomestico = elettrodomestici.get(idElettrodomestico);
 		elettrodomestico.setStato(StatoElettrodomestico.disattivato);
 		interruttori.get(elettrodomestico.getIdInterruttore()).turnOff();
+		timers.get(idElettrodomestico).removeObserver(this);
 	}
 	/**
 	 * provvede a riattivare l'elettrodomestico indicato: chiama turnOn sull'eletrodomesticoIndicato
@@ -371,6 +447,54 @@ public class  Scontrol extends Subject implements IObserver{
 	private IStatus preparaStatus(){
 		return this.preparaStatus("");
 	}
+	
+	/**
+	 * metodo che, in base al tipo di comando ricevuto da UserCmd esegue le richieste dell'utente
+	 * inviandogli lo stato aggiornato.
+	 */
+	private void riceviEdElaboraComandoUserCmd(){
+		try {
+			IMessageAndContext messaggio = scontrolGrant();
+			IComandoUserCmd comando = Util.stringToComandoUserCmd(messaggio.getReceivedMessage().msgContent());
+			IStatus statusDaInviare=this.preparaStatus();// inizializzo lo status con quello attuale, ma tanto verrà sovrascritto, è giusto per non mettere null.
+			if(comando.getComando()==ComandiUserCmd.connetti)
+				statusDaInviare = this.preparaStatus("Edi Energy Management, Benvenuti!");
+			else if (comando.getComando()== ComandiUserCmd.disconnetti)
+				statusDaInviare = this.preparaStatus("Arrivederci!");
+			else if (comando.getComando()== ComandiUserCmd.accendi){
+				/*
+				 *  nota: l'accensione di un elettrodomestico rende ncessario solo il controllo sullo 
+				 *  spegnimento preventiva
+				 *  
+				 */
+				if(this.valutaNecessitàSpegnimentoPreventivo())
+					statusDaInviare = this.preparaStatus("Impossibile accendere l'elettrodomestico "+comando.getIdElettrodomestico()+" tutta la potenza disponibile è già occupata da elettrodomestici a basso consumo non disattivabili");
+				else{
+					this.accendiElettrodomestico(comando.getIdElettrodomestico());
+					statusDaInviare = this.preparaStatus("elettrodomestico "+comando.getIdElettrodomestico()+" in accensione");
+				}
+			}// fine if accensione
+			else if(comando.getComando()==ComandiUserCmd.spegni){
+				this.spegniElettrodomestico(comando.getIdElettrodomestico());
+				if(this.valutaNecessitàRiattivazione()){
+					String daRiattivare = this.stabilisciElettrodomesticoDaRiattivare();
+					this.riattivaElettrodomestico(daRiattivare);
+					statusDaInviare = this.preparaStatus("lo spegnimento di  "+comando.getIdElettrodomestico()+" ha causato la riattivazione di "+daRiattivare);
+				}
+				else
+					statusDaInviare= this.preparaStatus("spento l'elettrodomestico "+comando.getIdElettrodomestico());
+			}// fine spegnimento
+			
+			// invio risposta e stato aggiornato
+			
+			messaggio.replyToCaller(Util.statutsToString(statusDaInviare));
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
+		
+	}
+	
 
 
 
@@ -394,16 +518,7 @@ public class  Scontrol extends Subject implements IObserver{
 	}
 	showMsg( "ask terminated " );
 		}
-	protected void scontrolAskComandoScontrol() throws Exception{
-		
-	IAcquireAskReply answer = support.ask( "scontrol", "comandoScontrol", M, "interruttore");
-	showMsg(  "has asked ... " + "comandoScontrol" );
-	while( !answer.askReplyAvailable() ) {
-		showMsg( "no ask yet received ... " );
-		Thread.sleep(100);
-	}
-	showMsg( "ask terminated " );
-		}
+	
 	
 	protected IMessageAndContext scontrolGrant() throws Exception{
 	IMessageAndContext m = support.grant( "scontrol" ,  "comandoUserCmd"  );
@@ -424,6 +539,37 @@ public class  Scontrol extends Subject implements IObserver{
 //Local body of the subject
 	protected void doJob(){
 	try{
+		/*
+		 * qui ci si occupa solo di ricevere e trattare i dati di consumo ricevuti dai sensori.
+		 * il thread RicevutoreComandi Usercmd provvede a ricevere i comandi dell'utente.
+		 * qui ci si limita a farlo prtire
+		 */
+		this.ricevitoreComandiUserCmd.start();
+		while(true){
+			sleep(50);
+			IMessage messaggioSensore = this.scontrolSense();
+			if(messaggioSensore != null){
+				IDatiSensore  datiSensore = Util.stringToDatiSensore(messaggioSensore.msgContent());
+				IRappresentazioneElettrodomestico elettrodomestico = elettrodomestici.get(datiSensore.getId());
+				// resetto il timer di sicurezza
+				this.timers.get(datiSensore.getId()).resetta();
+				// se l'elettrodomestico era in accensione ed invia un consumo pari alla metà delleo scorso vuol dire che 
+				// è passato nella fase di esercizio. ciò significa che bisogna verificare se è necessario disattivare
+				// qualche elettrodomestico, qualora fosse necessario viene fatto e ne viene mandata comunicazione all'utente
+				if((elettrodomestico.getStato()== StatoElettrodomestico.avvio)&& datiSensore.getConsumoAttuale()== (elettrodomestico.getConsumo()/2)){
+					elettrodomestico.setStato(StatoElettrodomestico.avvio);
+					elettrodomestico.setConsumo(datiSensore.getConsumoAttuale());
+					if(valutaNecessitàDisattivazione()==true){
+						String daDisattivare = this.stabilisciElettrodomesticoDaDisattivare();
+						this.disattivaElettrodomestico(this.stabilisciElettrodomesticoDaDisattivare());
+						userCmd.updateStatus(this.preparaStatus("disattivato elettrodomestico "+ daDisattivare));
+					}// fine if disattivazione elettrodomestico
+				}// fine if inizio fase di esercizio
+				else{
+					elettrodomestico.setConsumo(datiSensore.getConsumoAttuale());
+				}
+			}// fine if messaggio diverso da null
+		}
  		
 //operation scontrol : per le prove commenta e decommenta le comunicazioni di interesse
 
@@ -431,7 +577,7 @@ public class  Scontrol extends Subject implements IObserver{
 //	//showMessage(  m.getReceivedMessage() ) ;
 //	evalRequest( m  );
 //	 
-	 scontrolAskStatus() ;
+//	 scontrolAskStatus() ;
 //	 
 //
 //	 scontrolAskComandoScontrol() ;
@@ -447,8 +593,11 @@ public class  Scontrol extends Subject implements IObserver{
 
 
 	@Override
+	// qui ci vado se scatta il timeotu di un elettrodomestico: lo devo spegnere e mando comunicazione 
+	// a userCmd
 	public void update(IResettableTimer safetyTimer, String idElettrodomestico) {
-		// TODO Auto-generated method stub
+		this.spegniElettrodomestico(idElettrodomestico);
+		this.preparaStatus("non si ricevevano comunicazioni sul consumo da più di 2 secondi dall'elettrodomestico "+idElettrodomestico+". L'elettrodomestico è stato spento per ragioni di sicurezza");
 		
 	}
 }

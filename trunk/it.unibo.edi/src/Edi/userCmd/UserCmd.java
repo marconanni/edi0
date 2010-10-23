@@ -136,6 +136,15 @@ public class  UserCmd extends Subject implements IUserCmd{
 		}
 		
 	}
+	
+	/*
+	 * visto che l'invitation non funziona, scontrol invoca direttamente questo metodo
+	 * quando vuole comunicare spontaneamente un nuovo stato del sistema ( ad esempio perchè è stato 
+	 * disattivato un elettrodomestico) a usercmd
+	 */
+	public void updateStatus(IStatus status){
+		this.status=status;
+	}
 	//if userCmd must handle request or response
 	/**
 	 * 

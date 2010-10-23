@@ -193,50 +193,5 @@ public class Util {
 		
 	}
 	
-	
-	/**
-	 * metodo che trasforma un oggetto che implementa {@link IComandoScontrol} in una stringa
-	 * che contiene tutte le informazioni presenti nell'oggetto.
-	 * 
-	 * 
-	 * @param comandoScontrol l'oggetto da trasformare in stringa
-	 * @return un stringa che rappresenta il comando secondo la struttura:
-	 * 
-	 * comando
-	 * ad esempio
-	 * 
-	 * spegni
-	 * 
-	 */
-	
-	public static String comandoScontrolToString ( IComandoScontrol comandoScontrol ){
-		String stringona = comandoScontrol.getComando().toString();
-		return stringona;
-		
-	}
-	
-	
-	/**
-	 * Metodo che consente di recuperare un oggetto IComandoScontrol da una stringa formata secondo la covenzione 
-	 * indicata nel metodo  comandoScontrolToString, probabilmente ottenuta da un supporto di comunicazione:
-	 * 
-	 * 
-	 * @param un stringa che rappresenta il comando secondo la struttura:
-	 * 
-	 * comando
-	 * ad esempio
-	 * 
-	 * spegni
-	 * 
-	 * @return l'oggetto IComandoScontrol ottenuto dalla stringa
-	 */
-	public static IComandoScontrol stringToComandoScontrol(String string){
-		StringTokenizer st = new StringTokenizer(string);
-		ComandiScontrol comando = ComandiScontrol.valueOf(st.nextToken());
-		ComandoScontrol comandoScontrol = new ComandoScontrol(comando);
-		return comandoScontrol;
-		
-	}
-	
 
 }
