@@ -51,4 +51,6 @@ public interface IUserCmd {
 	 */
 	public void spegniElettrodomestico(String idElettrodomestico);
 
+	public void start();
+
 }

@@ -64,7 +64,7 @@ public class  Scontrol extends Subject implements IObserver{
 		 * @param intervalloTimers
 		 * @return
 		 */
-		public static Scontrol getInstance(List<IRappresentazioneElettrodomestico> elettrodomestici, int soglia, int intervalloTimers, List<IInterruttore> interruttori){
+		public static Scontrol getInstance(Vector<IRappresentazioneElettrodomestico> elettrodomestici, int soglia, int intervalloTimers, Vector<IInterruttore> interruttori){
 			if (instance==null){
 			instance = new Scontrol();
 		}
@@ -91,7 +91,7 @@ public class  Scontrol extends Subject implements IObserver{
 		return instance;
 	}
 
-		public static Scontrol getInstance(List<IRappresentazioneElettrodomestico> elettrodomestici, int soglia, int intervalloTimers, List<IInterruttore> interruttori, UserCmd userCmd){
+		public static Scontrol getInstance(Vector<IRappresentazioneElettrodomestico> elettrodomestici, int soglia, int intervalloTimers, Vector<IInterruttore> interruttori, UserCmd userCmd){
 			getInstance(elettrodomestici, soglia, intervalloTimers, interruttori);
 			instance.userCmd= userCmd;
 			return instance;
