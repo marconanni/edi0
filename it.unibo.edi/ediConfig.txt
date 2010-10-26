@@ -1,6 +1,8 @@
 //Edi Energy Management: file di configurazione
 Soglia di Consumo:150
-Tolleranza ricezione dati sensori (sec):2
+Tolleranza ricezione dati sensori (millisecondi):2000
+Numero di interruttori:9
+Numero di elettrodomestici:9
 //identificativi interruttori
 i1
 i2
@@ -11,7 +13,7 @@ i6
 i7
 i8
 i9
-//caratterisiche elettroodomestici collegati (id;tipologia di consumo (alto, medio, basso);stato;interruttore collegato
+//caratterisiche elettroodomestici collegati (id;tipologia di consumo (alto, medio, basso);stato;interruttore collegato;oraAccensione (necessario solo se lo stato dell'elettrodomestico è avvio, esercizio o disattivato)
 e1;basso;spento;i1
 e2;basso;spento;i2
 e3;basso;spento;i3
