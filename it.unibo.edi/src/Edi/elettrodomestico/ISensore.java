@@ -15,6 +15,6 @@ public interface ISensore {
 	 */
 	public void sendData();
 
-	public void start();
+	
 
 }
