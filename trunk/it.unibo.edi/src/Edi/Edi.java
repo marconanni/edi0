@@ -16,12 +16,12 @@ import Edi.messaggi.*;
 
 public  class Edi{
 
-private IUserCmd userCmd;
+private UserCmd userCmd;
 private Scontrol scontrol;
 private Vector<IInterruttore> interruttori = new Vector<IInterruttore>();
 private Vector<IElettrodomestico> elettrodomestici = new Vector<IElettrodomestico>();
 private Vector<IRappresentazioneElettrodomestico> rappresentazioniElettrodomestici = new Vector<IRappresentazioneElettrodomestico>();
-private Vector<ISensore> sensori = new Vector<ISensore>();
+private Vector<Sensore> sensori = new Vector<Sensore>();
 
 String pathname = "../ediConfig.txt";
 
@@ -55,20 +55,24 @@ String pathname = "../ediConfig.txt";
 		st = new StringTokenizer(righe.get(1), ":");
 		st.nextToken();
 		int soglia = Integer.parseInt(st.nextToken());
-		// intervallo spengimento di sicurezza
+		// intervallo invio dati consumo
 		st = new StringTokenizer(righe.get(2), ":");
 		st.nextToken();
-		int intervalloSicurezza = Integer.parseInt(st.nextToken());
-		// numero interruttori
+		long intervalloInvio = Long.parseLong(st.nextToken());
+		// intervallo spengimento di sicurezza
 		st = new StringTokenizer(righe.get(3), ":");
+		st.nextToken();
+		long intervalloSicurezza = Long.parseLong(st.nextToken());
+		// numero interruttori
+		st = new StringTokenizer(righe.get(4), ":");
 		st.nextToken();
 		int numeroInterruttori = Integer.parseInt(st.nextToken());
 		// numero elettrodomestici
-		st = new StringTokenizer(righe.get(4), ":");
+		st = new StringTokenizer(righe.get(5), ":");
 		st.nextToken();
 		int numeroElettrodomestici = Integer.parseInt(st.nextToken());
 		// creo gli interruttori
-		for (int i = 6; i < 6+numeroInterruttori; i++) {
+		for (int i = 7; i < 7+numeroInterruttori; i++) {
 			String id = righe.get(i);
 			interruttori.add(new Interruttore(id));			
 		}
@@ -76,17 +80,17 @@ String pathname = "../ediConfig.txt";
 		// TODO creo gli elettrodomestici con i relativi sensori e la sua  rappresentazione
 		
 		for (int i = 0; i <numeroElettrodomestici ; i++) {
-			int k = i+6+numeroInterruttori+1;
+			int k = i+7+numeroInterruttori+1;
 			Elettrodomestico e = this.creaEassociaElettrodomestico(righe.get(k), interruttori);
 			
-			sensori.add(new Sensore(500, e));
+			sensori.add(new Sensore(intervalloInvio, e));
 			elettrodomestici.add(e);
 			rappresentazioniElettrodomestici.add(this.CreaRappresentazioneElettrodomestico(righe.get(k)));
 		}
 		
 		// creo userCmd
 		
-		this.userCmd =  UserCmd.getInstance();
+		this.userCmd =  (UserCmd)UserCmd.getInstance();
 		// creo Scontrol
 		scontrol = Scontrol.getInstance(rappresentazioniElettrodomestici, soglia, intervalloSicurezza, interruttori, (UserCmd)userCmd);
 		

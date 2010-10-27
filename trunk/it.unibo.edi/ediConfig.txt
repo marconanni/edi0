@@ -1,5 +1,6 @@
 //Edi Energy Management: file di configurazione
 Soglia di Consumo:150
+Frequenza di invio dati di consumo (millisecondi):500
 Tolleranza ricezione dati sensori (millisecondi):2000
 Numero di interruttori:9
 Numero di elettrodomestici:9

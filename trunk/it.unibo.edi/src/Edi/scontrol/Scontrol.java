@@ -10,7 +10,7 @@ import Edi.elettrodomestico.*;
 import Edi.userCmd.*;
 	
 
-public class  Scontrol extends Subject implements IObserver{
+public class  Scontrol extends Subject implements IObserver, IScontrol{
 	
 	//Local state of the subject
 		private String M = "messaggioScontrol.";	
@@ -64,7 +64,7 @@ public class  Scontrol extends Subject implements IObserver{
 		 * @param intervalloTimers
 		 * @return
 		 */
-		public static Scontrol getInstance(Vector<IRappresentazioneElettrodomestico> elettrodomestici, int soglia, int intervalloTimers, Vector<IInterruttore> interruttori){
+		public static IScontrol getInstance(Vector<IRappresentazioneElettrodomestico> elettrodomestici, int soglia, long intervalloTimers, Vector<IInterruttore> interruttori){
 			if (instance==null){
 			instance = new Scontrol();
 		}
@@ -91,7 +91,7 @@ public class  Scontrol extends Subject implements IObserver{
 		return instance;
 	}
 
-		public static Scontrol getInstance(Vector<IRappresentazioneElettrodomestico> elettrodomestici, int soglia, int intervalloTimers, Vector<IInterruttore> interruttori, UserCmd userCmd){
+		public static Scontrol getInstance(Vector<IRappresentazioneElettrodomestico> elettrodomestici, int soglia, long intervalloTimers, Vector<IInterruttore> interruttori, UserCmd userCmd){
 			getInstance(elettrodomestici, soglia, intervalloTimers, interruttori);
 			instance.userCmd= userCmd;
 			return instance;
@@ -205,14 +205,8 @@ public class  Scontrol extends Subject implements IObserver{
 		}
 		
 		
-	/**
-	 * provvede ad accendere l'elettrodomestico indicato: chiama turnOn sull' interruttore collegato allleletrodomesticoIndicato
-	 * imposta l'ora di accensione, cambia lo stato dell'elettrodomestico in avvio 
-	 * e fa partire  e si registra al timer collegato all'interruttore
-	 * 
-	 * 
-	 * NON PROVVEDE AD INVIARE LO STATO AGGIORNATO A SCONTROL
-	 * @param idElettrodomestico: l'id dell'elettrodomestico da accendere
+	/* (non-Javadoc)
+	 * @see Edi.scontrol.IScontrol#accendiElettrodomestico(java.lang.String)
 	 */	
 	public void accendiElettrodomestico (String idElettrodomestico){
 		IRappresentazioneElettrodomestico elettrodomestico = elettrodomestici.get(idElettrodomestico);
@@ -225,12 +219,8 @@ public class  Scontrol extends Subject implements IObserver{
 		
 		
 	}
-	/**
-	 * provvede a spegnere l'elettrodomestico indicato: chiama turnOff sull' interruttore collegato allleletrodomesticoIndicato
-	 * e cambia lo stato dell'elettrodomestico in spento, azzerando il consumo attuale.
-	 * Infine si deregistra dal timer, in modo che  quando scatta non si riceve l'evento 
-	 * NON PROVVEDE AD INVIARE LO STATO AGGIORNATO A SCONTROL
-	 * @param idElettrodomestico: l'id dell'elettrodomestico da spegnere
+	/* (non-Javadoc)
+	 * @see Edi.scontrol.IScontrol#spegniElettrodomestico(java.lang.String)
 	 */
 	// TODO:  vedi se c'è il modo di forzare la terminazione del thread in modo che l'evento non venga creato del tutto
 	public void spegniElettrodomestico (String idElettrodomestico){
