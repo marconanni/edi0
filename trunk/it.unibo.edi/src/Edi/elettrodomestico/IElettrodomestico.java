@@ -42,6 +42,11 @@ public interface IElettrodomestico {
 	 * il superamento della soglia di consumo.
 	 */
 	public boolean isDisattivato();
+	/**
+	 * 
+	 * @return true se l'elettrodomestico è spento.
+	 */
+	public boolean isSpento();
 
 	/**
 	 * 
