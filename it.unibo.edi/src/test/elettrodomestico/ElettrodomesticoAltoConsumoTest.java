@@ -31,6 +31,7 @@ public class ElettrodomesticoAltoConsumoTest extends junit.framework.TestCase {
 	 * @param args
 	 */
 	public static void main(String[] args){
+		
 
 	}
 
@@ -53,23 +54,14 @@ public class ElettrodomesticoAltoConsumoTest extends junit.framework.TestCase {
 	  throws Exception{
 		super.tearDown();
 	}
-	/**
-	 * non potendo fare una sleep quesato metodo controlla solo l'accensione e non 
-	 * l'andare a regime, per fare questa prova, dopo aver aspettato sei secondi
-	 * invocare il metodo testEsercizio.
-	 */
-	public final void testAccendi(){
-		elettrodomestico.accendi();
-		long oraAccensione = System.currentTimeMillis();
-		assertEquals(elettrodomestico.getConsumoAttuale(),180);
-		assertTrue(elettrodomestico.getStato()== StatoElettrodomestico.avvio);
-		assertEquals(elettrodomestico.getOraAccensione().getTime(),oraAccensione,50);// metto mezzo decimo di secondo di tolleranza, non posso pensare che le due ore siano esatte al millisecondo.
-		
+	
+	public final void testGetConsumoAvvio(){
+		assertEquals(180, elettrodomestico.getConsumoAvvio());
 	}
 	
-	public void testEsercizio(){
-		assertTrue(elettrodomestico.getStato()== StatoElettrodomestico.esercizio);
-		assertEquals(elettrodomestico.getConsumoAttuale(), 90);
-		assertTrue(System.currentTimeMillis()-6000>=elettrodomestico.getOraAccensione().getTime());
+	public final void testGetConsumoEsercizio(){
+		assertEquals(90, elettrodomestico.getConsumoEsercizio());
 	}
+		
+	
 }//end ElettrodomesticoAltoConsumoTest

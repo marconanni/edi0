@@ -77,7 +77,12 @@ public class Elettrodomestico implements IElettrodomestico {
 	public boolean isDisattivato(){
 		return this.stato==StatoElettrodomestico.disattivato;
 	}
-	
+	/**
+	 * @see Edi.elettrodomestico.IElettrodomestico#isSpento()
+	 */
+	public boolean isSpento(){
+		return this.stato==StatoElettrodomestico.spento;
+	}
 	/**
 	 * @see Edi.elettrodomestico.IElettrodomestico#getStato()
 	 */
@@ -148,7 +153,8 @@ public class Elettrodomestico implements IElettrodomestico {
 	 * @see Edi.elettrodomestico.IElettrodomestico#spegni()
 	 */
 	public void spegni(){		
-			this.stato = StatoElettrodomestico.spento;	
+			this.stato = StatoElettrodomestico.spento;
+			this.oraAccensione=null;
 		
 	}
 	
@@ -157,7 +163,7 @@ public class Elettrodomestico implements IElettrodomestico {
 	 */
 	public void disattiva() {
 			this.stato = StatoElettrodomestico.disattivato;
-			
+			this.oraAccensione= null;
 		
 	}
 	

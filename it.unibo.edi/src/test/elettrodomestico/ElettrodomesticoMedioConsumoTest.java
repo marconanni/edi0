@@ -1,11 +1,16 @@
 package test.elettrodomestico;
 
+import Edi.elettrodomestico.*;
+import java.util.Date;
+
 /**
  * @author Marco
  * @version 1.0
  * @created 28-ott-2010 18:52:22
  */
 public class ElettrodomesticoMedioConsumoTest extends junit.framework.TestCase {
+	
+	private ElettrodomesticoMedioConsumo elettrodomestico;
 
 	public ElettrodomesticoMedioConsumoTest(){
 
@@ -37,6 +42,7 @@ public class ElettrodomesticoMedioConsumoTest extends junit.framework.TestCase {
 	protected void setUp()
 	  throws Exception{
 		super.setUp();
+		elettrodomestico =new ElettrodomesticoMedioConsumo(StatoElettrodomestico.spento, "e1", new Date());
 	}
 
 	/**
@@ -47,4 +53,13 @@ public class ElettrodomesticoMedioConsumoTest extends junit.framework.TestCase {
 	  throws Exception{
 		super.tearDown();
 	}
+	
+	public final void testGetConsumoAvvio(){
+		assertEquals(120, elettrodomestico.getConsumoAvvio());
+	}
+	
+	public final void testGetConsumoEsercizio(){
+		assertEquals(60, elettrodomestico.getConsumoEsercizio());
+	}
+	
 }//end ElettrodomesticoMedioConsumoTest
