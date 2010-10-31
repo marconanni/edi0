@@ -138,7 +138,7 @@ public class Util {
 	 * @return datiSensore l'oggetto ottenuto dalla stringa
 	 */
 	public static IDatiSensore stringToDatiSensore(String string){
-		StringTokenizer st = new StringTokenizer(string);
+		StringTokenizer st = new StringTokenizer(string,";");
 		String id = st.nextToken();
 		int consumoAttuale = Integer.parseInt(st.nextToken());
 		DatiSensore datiSensore = new DatiSensore(id, consumoAttuale);
