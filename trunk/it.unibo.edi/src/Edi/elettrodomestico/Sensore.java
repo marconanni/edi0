@@ -51,8 +51,6 @@ public class  Sensore extends Subject implements ISensore{
 		
 	}
 	
-	
-	
 	/**
 	 * metodo del supporto contact che provvede ad inviare la stringa M 
 	 * a Scontrol.
@@ -99,6 +97,40 @@ public class  Sensore extends Subject implements ISensore{
  	 
 
 		}
+	
+	}
+
+	/**
+	 * metodo usato per fare test, visto che il metodo sendData originale
+	 * chiamerebbe il supporto contact
+	 * @return la stringa che verrebbe inviata da sendData tramite il supporto contact
+	 */
+	public String sendDataFT(){
+		IDatiSensore datiSensore =new DatiSensore(this.elettrodomestico.getId(), this.elettrodomestico.getConsumoAttuale());
+		return Util.datiSensoreToString(datiSensore);
+	
+	}
+	
+	/**
+	 * questo metodo è stato introdotto per il testing della classe.
+	 * non potendo far partire il thread e inviare i messaggi tramite contact
+	 * questo metodo simula l'esecuzione di una sola ripetizione del ciclo infinito del metodo
+	 * originale.
+	 * @return  se l'elettrodomestico è acceso ritorna, tramite sendDataFT
+	 * la stringa che verrebbe inviata tramite contact, se è spento ritorna null.
+	 */
+	public String doJobFT(){
+		
+		
+			if (this.elettrodomestico.isOn()){
+				return this.sendDataFT();				
+			}
+			else
+				return null;
+			
+ 	 
+
+		
 	
 	}
 }

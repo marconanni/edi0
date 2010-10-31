@@ -1,6 +1,6 @@
 package test.elettrodomestico;
 
-import java.util.Date;
+
 
 import Edi.elettrodomestico.*;
 /**
@@ -42,7 +42,7 @@ public class ElettrodomesticoBassoConsumoTest extends junit.framework.TestCase {
 	protected void setUp()
 	  throws Exception{
 		super.setUp();
-		elettrodomestico = new ElettrodomesticoBassoConsumo(StatoElettrodomestico.spento, "e1", new Date());
+		elettrodomestico = new ElettrodomesticoBassoConsumo(StatoElettrodomestico.spento, "e1", null);
 	}
 
 	/**
