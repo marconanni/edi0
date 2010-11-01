@@ -183,6 +183,40 @@ public class Elettrodomestico implements IElettrodomestico {
 	private void setOraAccensione(Date oraAccensione) {
 		this.oraAccensione = oraAccensione;
 	}
+
+	
+	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Elettrodomestico))
+			return false;
+		Elettrodomestico other = (Elettrodomestico) obj;
+		if (consumoAvvio != other.consumoAvvio)
+			return false;
+		if (consumoEsercizio != other.consumoEsercizio)
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (oraAccensione == null) {
+			if (other.oraAccensione != null)
+				return false;
+		} else if (!oraAccensione.equals(other.oraAccensione))
+			return false;
+		if (stato == null) {
+			if (other.stato != null)
+				return false;
+		} else if (!stato.equals(other.stato))
+			return false;
+		return true;
+	}
 	
 	
 	

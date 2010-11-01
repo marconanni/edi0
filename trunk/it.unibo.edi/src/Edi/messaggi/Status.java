@@ -73,6 +73,34 @@ public class Status implements IStatus {
 				+ ", consumoAttualeComplessivo=" + consumoAttualeComplessivo
 				+ ", reports=" + reports + ", soglia=" + soglia + "]";
 	}
+
+	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Status other = (Status) obj;
+		if (comunicazione == null) {
+			if (other.comunicazione != null)
+				return false;
+		} else if (!comunicazione.equals(other.comunicazione))
+			return false;
+		if (consumoAttualeComplessivo != other.consumoAttualeComplessivo)
+			return false;
+		if (reports == null) {
+			if (other.reports != null)
+				return false;
+		} else if (!reports.equals(other.reports))
+			return false;
+		if (soglia != other.soglia)
+			return false;
+		return true;
+	}
 	
 	
 	

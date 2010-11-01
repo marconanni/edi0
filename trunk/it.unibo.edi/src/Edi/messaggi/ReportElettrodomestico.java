@@ -51,6 +51,32 @@ public class ReportElettrodomestico implements IReportElettrodomestico {
 	public int getConsumoAttuale() {
 		return ConsumoAttuale;
 	}
+
+	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ReportElettrodomestico other = (ReportElettrodomestico) obj;
+		if (ConsumoAttuale != other.ConsumoAttuale)
+			return false;
+		if (idElettrodomestico == null) {
+			if (other.idElettrodomestico != null)
+				return false;
+		} else if (!idElettrodomestico.equals(other.idElettrodomestico))
+			return false;
+		if (stato == null) {
+			if (other.stato != null)
+				return false;
+		} else if (!stato.equals(other.stato))
+			return false;
+		return true;
+	}
 	
 	
 	
