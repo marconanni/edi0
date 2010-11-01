@@ -221,4 +221,66 @@ public class  UserCmd extends Subject implements IUserCmd{
 
 	}catch( Exception e ){System.err.println("Errore in UserCmd");e.printStackTrace();}
 	}
+	
+	/**
+	 * metodo usato per il test: non manda il comando a Scontrol attraverso 
+	 * il supporto contact
+	 * @return il comando che, trasformato in stringa, verrebbe inviato a Scontrol
+	 */
+	public ComandoUserCmd connettiFT(){
+		
+		this.connesso=true;
+		return new ComandoUserCmd(ComandiUserCmd.connetti, "");	
+	}
+	/**
+	 * metodo usato per il test: non manda il comando a Scontrol attraverso 
+	 * il supporto contact
+	 * @return il comando che, trasformato in stringa, verrebbe inviato a Scontrol
+	 */
+	public ComandoUserCmd disconnettiFT (){
+		
+		
+		this.connesso=false;
+		this.status=null;
+		return new ComandoUserCmd(ComandiUserCmd.disconnetti, "");
+		
+	}
+	
+	
+	/**
+	 * metodo usato per il test: non manda il comando a Scontrol attraverso 
+	 * il supporto contact
+	 * @return il comando che, trasformato in stringa, verrebbe inviato a Scontrol
+	 */
+	public ComandoUserCmd accendiElettrodomesticoFT (String idElettrodomestico ){
+		
+		if (connesso)
+			return new ComandoUserCmd(ComandiUserCmd.accendi, idElettrodomestico);
+		else
+			System.err.println ("impossibile accendere un elettrodomestico se non si è connessi a Scontrol");
+		return null;
+	}
+	
+	
+	/**
+	 * metodo usato per il test: non manda il comando a Scontrol attraverso 
+	 * il supporto contact
+	 * @return il comando che, trasformato in stringa, verrebbe inviato a Scontrol
+	 */
+	public ComandoUserCmd spegniElettrodomesticoFT (String idElettrodomestico ){
+		if (connesso)
+			return new ComandoUserCmd(ComandiUserCmd.spegni, idElettrodomestico);
+		else
+			System.err.println ("impossibile spegnere un elettrodomestico se non si è connessi a Scontrol");
+		return null;
+	}
+	/**
+	 * metodo introdotto per il test: consente di simulare la ricezione 
+	 * di un nuovo status sotto forma di stringa senza utilizzare il supporto contact. 
+	 * @param status il nuovo status di UserCmd
+	 */
+	public void doJobFT(String stringStatus){
+		this.status= Util.stringToStatus(stringStatus);
+		
+	}
 }
