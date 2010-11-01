@@ -99,6 +99,31 @@ public class  Interruttore  implements IInterruttore{
 			return "Interruttore [elettrodomesticoCollegato="
 					+ elettrodomesticoCollegato + ", id=" + id + "]";
 		}
+
+		
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (!(obj instanceof Interruttore))
+				return false;
+			Interruttore other = (Interruttore) obj;
+			if (elettrodomesticoCollegato == null) {
+				if (other.elettrodomesticoCollegato != null)
+					return false;
+			} else if (!elettrodomesticoCollegato
+					.equals(other.elettrodomesticoCollegato))
+				return false;
+			if (id == null) {
+				if (other.id != null)
+					return false;
+			} else if (!id.equals(other.id))
+				return false;
+			return true;
+		}
 		
 		
 		

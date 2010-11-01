@@ -118,6 +118,53 @@ public class RappresentazioneElettrodomestico implements IRappresentazioneElettr
 	public void setOraAccensione(Date oraAccensione) {
 		this.oraAccensione = oraAccensione;
 	}
+
+
+
+	
+
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof RappresentazioneElettrodomestico))
+			return false;
+		RappresentazioneElettrodomestico other = (RappresentazioneElettrodomestico) obj;
+		if (consumo != other.consumo)
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (idInterruttore == null) {
+			if (other.idInterruttore != null)
+				return false;
+		} else if (!idInterruttore.equals(other.idInterruttore))
+			return false;
+		if (oraAccensione == null) {
+			if (other.oraAccensione != null)
+				return false;
+		} else if (!oraAccensione.equals(other.oraAccensione))
+			return false;
+		if (stato == null) {
+			if (other.stato != null)
+				return false;
+		} else if (!stato.equals(other.stato))
+			return false;
+		return true;
+	}
+
+
+
+	
+
+
+	
 	
 	
 	

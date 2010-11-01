@@ -47,5 +47,42 @@ public class ComandoUserCmd implements IComandoUserCmd {
 		return comando;
 	}
 
+
+
+	
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ComandoUserCmd other = (ComandoUserCmd) obj;
+		if (comando == null) {
+			if (other.comando != null)
+				return false;
+		} else if (!comando.equals(other.comando))
+			return false;
+		if (idElettrodomestico == null) {
+			if (other.idElettrodomestico != null)
+				return false;
+		} else if (!idElettrodomestico.equals(other.idElettrodomestico))
+			return false;
+		return true;
+	}
+	
+	
+
+
+
+	
+
+
+
+	
+
 	
 }

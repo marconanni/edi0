@@ -1,4 +1,5 @@
 package test.messaggi;
+import Edi.messaggi.*;
 
 /**
  * @author Marco
@@ -6,6 +7,9 @@ package test.messaggi;
  * @created 28-ott-2010 18:53:25
  */
 public class DatiSensoreTest extends junit.framework.TestCase {
+	private String idElettrodomestico = "e1";
+	private int consumo = 30;
+	private DatiSensore datiSensore;
 
 	public DatiSensoreTest(){
 
@@ -37,6 +41,7 @@ public class DatiSensoreTest extends junit.framework.TestCase {
 	protected void setUp()
 	  throws Exception{
 		super.setUp();
+		this.datiSensore = new DatiSensore(idElettrodomestico, consumo);
 	}
 
 	/**
@@ -46,9 +51,13 @@ public class DatiSensoreTest extends junit.framework.TestCase {
 	protected void tearDown()
 	  throws Exception{
 		super.tearDown();
+		this.datiSensore = new DatiSensore(idElettrodomestico, consumo);
 	}
 
-	public final void testDatiSensore(){
-
+	public final void testGetId(){
+		assertEquals(idElettrodomestico, datiSensore.getId());
+	}
+	public final void testGetConsumoAttuale(){
+		assertEquals(consumo, datiSensore.getConsumoAttuale());
 	}
 }//end DatiSensoreTest

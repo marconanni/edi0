@@ -185,7 +185,7 @@ public class Util {
 	 * @return l'oggetto IComandiUserCmd ottenuto dalla stringa
 	 */
 	public static IComandoUserCmd stringToComandoUserCmd(String string){
-		StringTokenizer st = new StringTokenizer(string);
+		StringTokenizer st = new StringTokenizer(string,";");
 		ComandiUserCmd comando = ComandiUserCmd.valueOf(st.nextToken());
 		String id = st.nextToken();
 		ComandoUserCmd comandoUserCmd = new ComandoUserCmd(comando, id);
