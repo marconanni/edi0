@@ -61,9 +61,9 @@ public class  Interruttore  implements IInterruttore{
 		 */
 		public boolean isCollegato(){
 			if(this.elettrodomesticoCollegato==null)
-				return true;
-			else
 				return false;
+			else
+				return true;
 		}
 		
 		/**
