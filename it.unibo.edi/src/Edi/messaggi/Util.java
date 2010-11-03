@@ -187,7 +187,9 @@ public class Util {
 	public static IComandoUserCmd stringToComandoUserCmd(String string){
 		StringTokenizer st = new StringTokenizer(string,";");
 		ComandiUserCmd comando = ComandiUserCmd.valueOf(st.nextToken());
-		String id = st.nextToken();
+		String id ="";
+		if(st.hasMoreTokens())
+			 id = st.nextToken();
 		ComandoUserCmd comandoUserCmd = new ComandoUserCmd(comando, id);
 		return comandoUserCmd;
 		
