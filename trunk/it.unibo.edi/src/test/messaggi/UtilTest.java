@@ -90,6 +90,9 @@ public class UtilTest extends junit.framework.TestCase {
 		IComandoUserCmd expected = new ComandoUserCmd(ComandiUserCmd.spegni,"e1");
 		IComandoUserCmd result = Util.stringToComandoUserCmd("spegni;e1");
 		assertEquals(expected,result);
+		expected = new ComandoUserCmd(ComandiUserCmd.connetti,"");
+		result = Util.stringToComandoUserCmd("connetti;");
+		assertEquals(expected,result);
 		
 
 	}

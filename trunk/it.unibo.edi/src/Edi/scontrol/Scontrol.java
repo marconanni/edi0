@@ -247,8 +247,8 @@ public class  Scontrol extends Subject implements IObserver, IScontrol{
 		timers.get(idElettrodomestico).removeObserver(this);
 	}
 	/**
-	 * provvede a riattivare l'elettrodomestico indicato: chiama turnOn sull'eletrodomesticoIndicato
-	 * e cambia lo stato dell'elettrodomestico in avvio (secondo la logica attuale la riattivazione è di fatto una accensione. 
+	 * provvede a riattivare l'elettrodomestico indicato: chiama accendiElettrodomestico sull'eletrodomesticoIndicato
+	 * e cambia lo stato dell'elettrodomestico in avvio (secondo la logica attuale la riattivazione è di fatto una accensione). 
 	 * NON PROVVEDE AD INVIARE LO STATO AGGIORNATO A SCONTROL
 	 * @param idElettrodomestico: l'id dell'elettrodomestico da riattivare
 	 */
@@ -279,31 +279,12 @@ public class  Scontrol extends Subject implements IObserver, IScontrol{
 	 * @return l'identificativo dell'elettrodomestico da riattivare
 	 */
 	private String stabilisciElettrodomesticoDaRiattivare (){
-		Vector<IRappresentazioneElettrodomestico> elettrodomesticiCheConsumanoMeno = new Vector<IRappresentazioneElettrodomestico>();
-		IRappresentazioneElettrodomestico prescelto = null;
-		int minimo = Integer.MAX_VALUE;
+		// creo il peggiore elettrodomestico, acceso adesso e con consumo pari al maggior valore per un int: verrà per forza sovrescritto
+		IRappresentazioneElettrodomestico prescelto = new RappresentazioneElettrodomestico("", StatoElettrodomestico.esercizio, Integer.MAX_VALUE, "", new Date());
 		for (IRappresentazioneElettrodomestico elettrodomestico : elettrodomestici.values()) {
-			if(elettrodomestico.getStato()==StatoElettrodomestico.disattivato && elettrodomestico.getConsumo()<=minimo){
-				minimo = elettrodomestico.getConsumo();
-				if (elettrodomestico.getConsumo()==minimo)
-					elettrodomesticiCheConsumanoMeno.add(elettrodomestico);
-				if(elettrodomestico.getConsumo()<minimo){
-					elettrodomesticiCheConsumanoMeno.removeAllElements();
-					elettrodomesticiCheConsumanoMeno.add(elettrodomestico);
-				}
-					
-			}
-			
+			if (elettrodomestico.getStato()==StatoElettrodomestico.disattivato&&(elettrodomestico.getConsumo()<prescelto.getConsumo()|| (elettrodomestico.getConsumo()== prescelto.getConsumo()&& elettrodomestico.getOraAccensione().before(prescelto.getOraAccensione()))))
+				prescelto = elettrodomestico;
 		}
-		
-		Date oraAccensioneMinima= new Date(System.currentTimeMillis());
-		for (IRappresentazioneElettrodomestico elettrodomestico : elettrodomesticiCheConsumanoMeno) {
-			if(elettrodomestico.getOraAccensione().before(oraAccensioneMinima)){
-				oraAccensioneMinima = elettrodomestico.getOraAccensione();
-				prescelto= elettrodomestico;
-			}
-		}
-		
 		return prescelto.getId();
 		
 	}
@@ -361,7 +342,7 @@ public class  Scontrol extends Subject implements IObserver, IScontrol{
 		 * per cui evito di metterlo
 		 */
 		for (IRappresentazioneElettrodomestico elettrodomestico : elettrodomestici.values()) {
-			if(elettrodomestico.getStato()== StatoElettrodomestico.disattivato && elettrodomestico.getConsumo()<=soglia)
+			if(elettrodomestico.getStato()== StatoElettrodomestico.disattivato && elettrodomestico.getConsumo()<=margine)
 				return true;
 			
 		}
@@ -419,11 +400,11 @@ public class  Scontrol extends Subject implements IObserver, IScontrol{
 			if(elettrodomestico.getStato()==StatoElettrodomestico.disattivato)
 				reports.add(new ReportElettrodomestico(elettrodomestico.getId(), elettrodomestico.getStato(), 0));
 			else
-				reports.add(new ReportElettrodomestico(elettrodomestico.getId(), elettrodomestico.getStato(), 0));
+				reports.add(new ReportElettrodomestico(elettrodomestico.getId(), elettrodomestico.getStato(), elettrodomestico.getConsumo()));
 						
 		}
 		
-		return new  Status(comunicazione, reports, this.calcolaConsumoAttualeComplessivo());
+		return new  Status(comunicazione, reports, soglia);
 	}
 	/**
 	 * metodo che prepara un oggetto status da inviare a UserCmd tramite il supporto contact
@@ -590,4 +571,150 @@ public class  Scontrol extends Subject implements IObserver, IScontrol{
 		this.preparaStatus("non si ricevevano comunicazioni sul consumo da più di 2 secondi dall'elettrodomestico "+idElettrodomestico+". L'elettrodomestico è stato spento per ragioni di sicurezza");
 		
 	}
+	
+	
+	//TODO: metodi aggiunti per i test.
+	/**
+	 * metodo che serve a poter visualizzare il consumo di tutti gli elettrdomestici in fase di esercizio
+	 * */
+	public int calcolaConsumoAttualeFT(){
+		return this.calcolaConsumoAttuale();
+		
+	}
+	/**
+	 * metodo che serve a visualizzare il consumo totale di tutti gli elettrdomestici accesi nei test
+	 * @return
+	 */
+	public int calcolaConsumoAttualeComplessivoFT(){
+		return this.calcolaConsumoAttualeComplessivo();
+	}
+	/**
+	 * metodo che serve pre rompere l'incapsulamento col fine di verificare nei test il
+	 * il risultato dell'omonimo metodo privato 
+	 * @return il risultato del metodo omonimo privato
+	 */
+	public boolean valutaNecessitàSpegnimentoPreventivoFT(){
+		return this.valutaNecessitàSpegnimentoPreventivo();
+	}
+	/**
+	 * metodo che serve pre rompere l'incapsulamento col fine di verificare nei test il
+	 * il risultato dell'omonimo metodo privato 
+	 * @return il risultato del metodo omonimo privato
+	 */
+	public boolean valutaNecessitàDisattivazioneFT(){
+		return this.valutaNecessitàDisattivazione();
+	}
+	/**
+	 * metodo che serve pre rompere l'incapsulamento col fine di verificare nei test il
+	 * il risultato dell'omonimo metodo privato 
+	 * @return il risultato del metodo omonimo privato
+	 */
+	public boolean valutaNecessitàRiattivazioneFT(){
+		return this.valutaNecessitàRiattivazione();
+	}
+	/**
+	 * metodo che serve pre rompere l'incapsulamento col fine di verificare nei test il
+	 * il risultato dell'omonimo metodo privato 
+	 * @return il risultato del metodo omonimo privato
+	 */
+	public String stabilisciElettrodomesticoDaDisattivareFT(){
+		return this.stabilisciElettrodomesticoDaDisattivare();
+	}
+	/**
+	 * metodo che serve pre rompere l'incapsulamento col fine di verificare nei test il
+	 * il risultato dell'omonimo metodo privato 
+	 * @return il risultato del metodo omonimo privato
+	 */
+	public String stabilisciElettrodomesticoDaRiattivareFT(){
+		return this.stabilisciElettrodomesticoDaRiattivare();
+	}
+	/**
+	 * metodo che serve pre rompere l'incapsulamento col fine di verificare nei test 
+	 * l'omonimo metodo privato 
+	 */
+	public void disattivaElettrodomesticoFT(String idElettrodomestico){
+		this.disattivaElettrodomestico(idElettrodomestico);
+	}
+	/**
+	 * metodo che serve pre rompere l'incapsulamento col fine di verificare nei test 
+	 * l'omonimo metodo privato 
+	 */
+	public void riattivaElettrodomesticoFT(String idElettrodomestico){
+		this.riattivaElettrodomestico(idElettrodomestico);
+	}
+	
+	/**
+	 * 
+	 * metodo che permette di simulare la ricezione e l'esecuzione di un comando utente
+	 * @param comandoString: la versione in stringa del comando che scontrol deve eseguire
+	 * @return un oggetto Status che verrebbe stringhificato e mandato tramite il supporto
+	 * contact a userCmd.
+	 */
+	public IStatus riceviEdElaboraComandoUserCmdFT(String comandoString){
+		
+			
+			IComandoUserCmd comando = Util.stringToComandoUserCmd(comandoString);
+			IStatus statusDaInviare=this.preparaStatus();// inizializzo lo status con quello attuale, ma tanto verrà sovrascritto, è giusto per non mettere null.
+			if(comando.getComando()==ComandiUserCmd.connetti)
+				statusDaInviare = this.preparaStatus("Edi Energy Management, Benvenuti!");
+			else if (comando.getComando()== ComandiUserCmd.disconnetti)
+				statusDaInviare = this.preparaStatus("Arrivederci!");
+			else if (comando.getComando()== ComandiUserCmd.accendi){
+				/*
+				 *  nota: l'accensione di un elettrodomestico rende ncessario solo il controllo sullo 
+				 *  spegnimento preventiva
+				 *  
+				 */
+				if(this.valutaNecessitàSpegnimentoPreventivo())
+					statusDaInviare = this.preparaStatus("Impossibile accendere l'elettrodomestico "+comando.getIdElettrodomestico()+" tutta la potenza disponibile è già occupata da elettrodomestici a basso consumo non disattivabili");
+				else{
+					this.accendiElettrodomestico(comando.getIdElettrodomestico());
+					statusDaInviare = this.preparaStatus("elettrodomestico "+comando.getIdElettrodomestico()+" in accensione");
+				}
+			}// fine if accensione
+			else if(comando.getComando()==ComandiUserCmd.spegni){
+				this.spegniElettrodomestico(comando.getIdElettrodomestico());
+				if(this.valutaNecessitàRiattivazione()){
+					String daRiattivare = this.stabilisciElettrodomesticoDaRiattivare();
+					this.riattivaElettrodomestico(daRiattivare);
+					statusDaInviare = this.preparaStatus("lo spegnimento di  "+comando.getIdElettrodomestico()+" ha causato la riattivazione di "+daRiattivare);
+				}
+				else
+					statusDaInviare= this.preparaStatus("spento l'elettrodomestico "+comando.getIdElettrodomestico());
+			}// fine spegnimento
+			
+			return statusDaInviare;
+		
+	}
+	
+	/**
+	 * questo metodo permette di simulare ciò che accade quando Scontrol riceve i dati di consumo
+	 * da un sensore.
+	 * @param datiSensoreString la stringa dei dati sensore che Scontrol riceverebbe dal supporto contact.
+	 */
+	public void riceviDatiSensoreFT(String datiSensoreString){
+		
+		
+	
+			IDatiSensore  datiSensore = Util.stringToDatiSensore(datiSensoreString);
+			IRappresentazioneElettrodomestico elettrodomestico = elettrodomestici.get(datiSensore.getId());
+			// resetto il timer di sicurezza
+			this.timers.get(datiSensore.getId()).resetta();
+			// se l'elettrodomestico era in accensione ed invia un consumo pari alla metà delleo scorso vuol dire che 
+			// è passato nella fase di esercizio. ciò significa che bisogna verificare se è necessario disattivare
+			// qualche elettrodomestico, qualora fosse necessario viene fatto e ne viene mandata comunicazione all'utente
+			if((elettrodomestico.getStato()== StatoElettrodomestico.avvio)&& datiSensore.getConsumoAttuale()== (elettrodomestico.getConsumo()/2)){
+				elettrodomestico.setStato(StatoElettrodomestico.esercizio);
+				elettrodomestico.setConsumo(datiSensore.getConsumoAttuale());
+				if(valutaNecessitàDisattivazione()==true){
+					
+					this.disattivaElettrodomestico(this.stabilisciElettrodomesticoDaDisattivare());
+					
+				}// fine if disattivazione elettrodomestico
+			}// fine if inizio fase di esercizio
+			else{
+				elettrodomestico.setConsumo(datiSensore.getConsumoAttuale());
+			}
+	}
+	
 }

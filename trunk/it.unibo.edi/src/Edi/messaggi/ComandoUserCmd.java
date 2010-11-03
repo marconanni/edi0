@@ -52,13 +52,14 @@ public class ComandoUserCmd implements IComandoUserCmd {
 	
 
 
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (!(obj instanceof ComandoUserCmd))
 			return false;
 		ComandoUserCmd other = (ComandoUserCmd) obj;
 		if (comando == null) {
@@ -73,6 +74,13 @@ public class ComandoUserCmd implements IComandoUserCmd {
 			return false;
 		return true;
 	}
+
+
+
+	
+
+
+	
 	
 	
 
