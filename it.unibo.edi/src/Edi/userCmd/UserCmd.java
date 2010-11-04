@@ -123,6 +123,7 @@ public class  UserCmd extends Subject implements IUserCmd{
 	private void mandaComandoAScontrol (ComandiUserCmd cmd,String idElettrodomestico ){
 		ComandoUserCmd comando = new ComandoUserCmd(cmd, idElettrodomestico);
 		String cmdString = Util.comandoUserCmdToString(comando);
+		System.out.println("*****Inviato comando: "+cmdString);
 		// impacchetto il messaggio per contact
 		this.M=cmdString;
 		// invio messaggio e ricezione della risposta. 
@@ -130,6 +131,7 @@ public class  UserCmd extends Subject implements IUserCmd{
 		try {
 			IAcquireDemandReply m = userCmdDemand();
 			evalResponse( m );
+			System.out.println("*****ricevuto Status : "+status);
 		} catch (Exception e) {
 			System.err.println("problemi nell'invio del messaggio: "+cmdString+" a Scontrol");
 			e.printStackTrace();
@@ -204,17 +206,18 @@ public class  UserCmd extends Subject implements IUserCmd{
 	//	showMessage( "",m2 ) ;
 	 
 		// operazioni vere: se sono connesso aspetto eventuali messaggi di aggiornamento delllo
-		// stato del sistema da Scontrol, e aggiorno lo statu
-		while(true){
-			if(this.isConnesso()){
-				IMessage m = userCmdAccept();
-				showMessage("ricevuto messaggio ", m);
-				String strStatus= m.msgContent();
-				showMsg("nuovoStato: "+strStatus);
-				// aggioro lo stato
-				this.status=Util.stringToStatus(strStatus);
-			}
-		}
+		// stato del sistema da Scontrol, e aggiorno lo status
+		// è commentato visto che non vanno le invitation di contact.
+//		while(true){
+//			if(this.isConnesso()){
+//				IMessage m = userCmdAccept();
+//				showMessage("ricevuto messaggio ", m);
+//				String strStatus= m.msgContent();
+//				showMsg("nuovoStato: "+strStatus);
+//				// aggioro lo stato
+//				this.status=Util.stringToStatus(strStatus);
+//			}
+//		}
 
 
 

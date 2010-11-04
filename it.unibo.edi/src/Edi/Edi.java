@@ -23,7 +23,7 @@ private Vector<IElettrodomestico> elettrodomestici = new Vector<IElettrodomestic
 private Vector<IRappresentazioneElettrodomestico> rappresentazioniElettrodomestici = new Vector<IRappresentazioneElettrodomestico>();
 private Vector<Sensore> sensori = new Vector<Sensore>();
 
-String pathname = "../ediConfig.txt";
+String pathname = "C:/Users/Marco/eclipseProjects/it.unibo.edi/ediConfig.txt";
 
 	
 	public void doJob(){
@@ -103,6 +103,10 @@ String pathname = "../ediConfig.txt";
 			 sensori.get(k).start();
 			
 		}
+		
+		userCmd.connetti();
+		userCmd.accendiElettrodomestico("e1");
+		userCmd.disconnetti();
  	}
 	
  	public static void main(String args[]) throws Exception {
@@ -118,7 +122,7 @@ String pathname = "../ediConfig.txt";
  			String linea=reader.readLine();
 
  			while(linea!=null) {
- 			       System.out.println("letta riga : " +linea);
+ 			      
  			       righe.add(linea);
  			       linea=reader.readLine();
  			       
@@ -138,7 +142,7 @@ String pathname = "../ediConfig.txt";
  		String tipo = st.nextToken();
  		StatoElettrodomestico stato = StatoElettrodomestico.valueOf(st.nextToken());
  		String idInterruttore = st.nextToken();
- 		Date oraAccensione = new Date();
+ 		Date oraAccensione = null;
  		if (stato != StatoElettrodomestico.spento)
  			oraAccensione = new Date(Long.parseLong(st.nextToken()));
  		// creo l'elettrodomestico:
