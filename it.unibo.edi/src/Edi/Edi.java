@@ -94,7 +94,13 @@ String pathname = "C:/Users/Marco/eclipseProjects/it.unibo.edi/ediConfig.txt";
 		// creo Scontrol
 		scontrol = Scontrol.getInstance(rappresentazioniElettrodomestici, soglia, intervalloSicurezza, interruttori, (UserCmd)userCmd);
 		
-		// configuro i nomi, così contact dovrebbe funzionare
+		for (Sensore sensore : sensori) {
+			sensore.setScontrol(scontrol);
+			
+		}
+		
+		
+		// configuro i nomi, anche se contact non funziona comunque
 		userCmd.setName("Subject-userCmd");
 		scontrol.setName("Subject-scontrol");
 		for (Sensore sensore : sensori) {
@@ -113,6 +119,12 @@ String pathname = "C:/Users/Marco/eclipseProjects/it.unibo.edi/ediConfig.txt";
 		
 		userCmd.connetti();
 		userCmd.accendiElettrodomestico("e1");
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		userCmd.disconnetti();
  	}
 	
@@ -163,7 +175,7 @@ String pathname = "C:/Users/Marco/eclipseProjects/it.unibo.edi/ediConfig.txt";
  		// collego l'interruttore con l'elettrodomestico
  		for (int k = 0; k < interruttori2.size(); k++) {
 			IInterruttore interruttore = interruttori2.get(k);
-			if (interruttore.getId()== idInterruttore)
+			if (interruttore.getId().equals( idInterruttore))
 				interruttore.setElettrodomesticoCollegato(elettrodomestico);
 			
 		}

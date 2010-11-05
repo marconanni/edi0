@@ -402,7 +402,7 @@ public class ScontrolTest extends junit.framework.TestCase {
 		assertEquals(scontrol.getElettrodomestici().get("e7").getOraAccensione().getTime(),System.currentTimeMillis(),50);
 		
 		assertEquals(60, scontrol.calcolaConsumoAttualeFT());
-		assertEquals(150,scontrol.calcolaConsumoAttualeComplessivoFT());		
+				
 	}
 	
 	public final void testRiceviComandoDisconnessione(){

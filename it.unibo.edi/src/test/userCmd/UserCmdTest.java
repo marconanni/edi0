@@ -5,6 +5,7 @@ import Edi.elettrodomestico.StatoElettrodomestico;
 import Edi.messaggi.ComandiUserCmd;
 import Edi.messaggi.ComandoUserCmd;
 import Edi.messaggi.IReportElettrodomestico;
+import Edi.messaggi.IStatus;
 import Edi.messaggi.ReportElettrodomestico;
 import Edi.messaggi.Status;
 import Edi.userCmd.*;
@@ -14,7 +15,7 @@ import Edi.userCmd.*;
  * @version 1.0
  * @created 28-ott-2010 18:55:24
  */
-public class UserCmdTest extends junit.framework.TestCase {
+public class UserCmdTest extends junit.framework.TestCase implements IGui {
 	
 	private UserCmd userCmd ;
 
@@ -95,5 +96,24 @@ public class UserCmdTest extends junit.framework.TestCase {
 		Status status = new Status("hello,world!", reports, 300);
 		this.userCmd.doJobFT(Edi.messaggi.Util.statutsToString(status));
 		assertEquals(status, userCmd.getStatus());
+	}
+	
+	public final void testNotifyGui(){
+		userCmd.addGui(this);
+		// creo un nuovo status 
+		userCmd.connettiFT();
+		Vector <IReportElettrodomestico> reports = new Vector<IReportElettrodomestico>();
+		reports.add( new ReportElettrodomestico("e1", StatoElettrodomestico.spento, 0));
+		reports.add( new ReportElettrodomestico("e2", StatoElettrodomestico.esercizio, 60));
+		reports.add( new ReportElettrodomestico("e3", StatoElettrodomestico.avvio, 120));
+		Status status = new Status("hello,world!", reports, 300);
+		userCmd.notifiyGui(status);
+		userCmd.removeGui(this);
+	}
+
+	@Override
+	public void update(IStatus newStatus) {
+		assertNotNull(newStatus);
+		
 	}
 }//end UserCmdTest

@@ -4,6 +4,7 @@ package Edi.elettrodomestico;
 import it.unibo.platform.medcl.*;
 import it.unibo.platform.lindaLike.IMessage;
 import Edi.messaggi.*;
+import Edi.scontrol.Scontrol;
 	
 /**
  * 
@@ -22,6 +23,12 @@ public class  Sensore extends Subject implements ISensore{
 		private long intervalloInvio;
 		private IElettrodomestico elettrodomestico;
 		
+		// visto che contact non funziona
+		private Scontrol scontrol;
+		
+		public void setScontrol (Scontrol scontrol){
+			this.scontrol= scontrol;
+		}
 	
 	
 		
@@ -42,13 +49,18 @@ public class  Sensore extends Subject implements ISensore{
 	 */
 	public void sendData(){
 		IDatiSensore datiSensore =new DatiSensore(this.elettrodomestico.getId(), this.elettrodomestico.getConsumoAttuale());
-		M= Util.datiSensoreToString(datiSensore);
-		try {
-			this.sensoreEmit();
-		} 
-		catch( Exception e ){System.err.println("Errore in Sensore");e.printStackTrace();}
 		
+		/*
+		 * commentato visto che contact non fuziona viene eseguito il codice sotto che invoca direttamente
+		 * i metodi di Scontrol
+		 */
+//		M= Util.datiSensoreToString(datiSensore);
+//		try {
+//			this.sensoreEmit();
+//		} 
+//		catch( Exception e ){System.err.println("Errore in Sensore");e.printStackTrace();}
 		
+		scontrol.riceviDatiSensoreFT(Util.datiSensoreToString(datiSensore));
 	}
 	
 	/**
@@ -123,6 +135,7 @@ public class  Sensore extends Subject implements ISensore{
 		
 		
 			if (this.elettrodomestico.isOn()){
+				
 				return this.sendDataFT();				
 			}
 			else

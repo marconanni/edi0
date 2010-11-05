@@ -1,5 +1,7 @@
 package Edi.userCmd;
 
+
+
 import Edi.messaggi.IStatus;
 
 
@@ -50,5 +52,30 @@ public interface IUserCmd {
 	 * @param idElettrodomestico: l'identificativo dell'elettrodomestico da spegnere
 	 */
 	public void spegniElettrodomestico(String idElettrodomestico);
+	
+	/**
+	 * metodo che permette di registrare un'interfaccia utente a Scontrol
+	 * dal momento della registrazione, ad ogni cambiamento dello status, la gui
+	 * vedrà chiamato il suo metodo update e gli sarà passato il nuovo
+	 * stato del sistema come parametro
+	 * @param gui un oggetto (il metodo è stato pensato per le interfacce utente) che implementi
+	 * IGui
+	 */
+	public void addGui(IGui gui);
+	
+	/**
+	 * metodo che serve per deregistrare un'interfaccia utente. dal momento della deregistrazione in poi
+	 * l'interfaccia utente non vedrà piu notificata di cambiamanti dello stato
+	 * @param gui un oggetto (il metodo è stato pensato per le interfacce utente) che implementi
+	 * IGui
+	 */
+	public void removeGui(IGui gui);
+	
+	/**
+	 * metodo che provoca la chiamata del metodo update delle gui registrate
+	 * alle quali viene inviato lo status passato come parametro
+	 * @param newStatus
+	 */
+	public void notifiyGui(IStatus newStatus);
 
 }

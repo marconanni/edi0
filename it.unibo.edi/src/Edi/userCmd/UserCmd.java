@@ -1,10 +1,14 @@
 package Edi.userCmd;
 
+
+
 import Edi.Subject;
 import Edi.messaggi.*;
+import Edi.scontrol.Scontrol;
 import it.unibo.platform.medcl.*;
 import it.unibo.platform.lindaLike.IMessage;
-	
+import java.util.*;
+
 
 /**
  * 
@@ -16,7 +20,7 @@ import it.unibo.platform.lindaLike.IMessage;
  * in esso. E' compito dell'interfaccia utente visualizzare il suddetto stato
  *
  */
-public class  UserCmd extends Subject implements IUserCmd{
+public class  UserCmd extends Subject implements IUserCmd {
 	
 	// variabili che servono al supporto contact
 	//Local state of the subject
@@ -31,14 +35,22 @@ public class  UserCmd extends Subject implements IUserCmd{
 		private boolean connesso;
 		// lo stato del sistema: è null se non si è connessi.
 		private IStatus status;
+		// le interfacce utente che si sono registrate 
+		private Vector<IGui> guis;
 		
-		
-		
-		
+		// visto che contact non va ho bisogno di comunicare direttamente con scontrol
+		private Scontrol scontrol;
+				
 	
+	public void setScontrol(Scontrol scontrol) {
+			this.scontrol = scontrol;
+		}
+
+
 	private UserCmd() {
 			this.connesso= false;
 			status = null;
+			this.guis=new Vector<IGui>();
 			
 		}
 	
@@ -83,7 +95,7 @@ public class  UserCmd extends Subject implements IUserCmd{
 		
 		mandaComandoAScontrol(ComandiUserCmd.disconnetti, "");
 		this.connesso=false;
-		this.status=null;
+		
 		
 	}
 	
@@ -110,6 +122,35 @@ public class  UserCmd extends Subject implements IUserCmd{
 			System.err.println ("impossibile spegnere un elettrodomestico se non si è connessi a Scontrol");
 		
 	}
+	/**
+	 * @see Edi.userCmd.IUserCmd#addGui()
+	 */
+	@Override
+	public void addGui(IGui gui) {
+		guis.add(gui);
+		
+	}
+
+	/**
+	 * @see Edi.userCmd.IUserCmd#notifiyGui()
+	 */
+	@Override
+	public void notifiyGui(IStatus newStatus) {
+		for (IGui gui : guis) {
+			gui.update(newStatus);
+			
+		}
+		
+	}
+
+	/**
+	 * @see Edi.userCmd.IUserCmd#removeGui()
+	 */
+	@Override
+	public void removeGui(IGui gui) {
+		guis.remove(gui);
+		
+	}
 	
 	/**
 	 * metodo di utilità che consente di mandare un generico messaggio a Scontrol:
@@ -124,19 +165,27 @@ public class  UserCmd extends Subject implements IUserCmd{
 		ComandoUserCmd comando = new ComandoUserCmd(cmd, idElettrodomestico);
 		String cmdString = Util.comandoUserCmdToString(comando);
 		System.out.println("*****Inviato comando: "+cmdString);
-		// impacchetto il messaggio per contact
-		this.M=cmdString;
-		// invio messaggio e ricezione della risposta. 
-		// nota evalResponse aggiorna lo status
-		try {
-			IAcquireDemandReply m = userCmdDemand();
-			evalResponse( m );
-			System.out.println("*****ricevuto Status : "+status);
-		} catch (Exception e) {
-			System.err.println("problemi nell'invio del messaggio: "+cmdString+" a Scontrol");
-			e.printStackTrace();
-		}
+		/*
+		 * visto che contact non funziona ho commentato il codice sotto
+		 * ora  chiamo direttamente il metodo riceviEdElaboraComandoUserCmdFT di Scontrol
+		 * e aggiorno lo staus
+		 */
+//		// impacchetto il messaggio per contact
+//		this.M=cmdString;
+//		// invio messaggio e ricezione della risposta. 
+//		// nota evalResponse aggiorna lo status
+//		try {
+//			IAcquireDemandReply m = userCmdDemand();
+//			evalResponse( m );
+//			System.out.println("*****ricevuto Status : "+status);
+//		} catch (Exception e) {
+//			System.err.println("problemi nell'invio del messaggio: "+cmdString+" a Scontrol");
+//			e.printStackTrace();
+//		}
 		
+		IStatus nuovoStatus = scontrol.riceviEdElaboraComandoUserCmdFT(cmdString);
+		this.updateStatus(nuovoStatus);
+		System.out.println("***UserCmd: il nuovo stato è\n"+nuovoStatus);
 	}
 	
 	/*
@@ -146,6 +195,7 @@ public class  UserCmd extends Subject implements IUserCmd{
 	 */
 	public void updateStatus(IStatus status){
 		this.status=status;
+		this.notifiyGui(status);
 	}
 	//if userCmd must handle request or response
 	/**
@@ -162,7 +212,7 @@ public class  UserCmd extends Subject implements IUserCmd{
 		}
 		showMsg( "received " + answer.acquireDemandReply().msgContent());
 		String strStatus = answer.acquireDemandReply().msgContent();
-		this.status=Util.stringToStatus(strStatus);
+		this.updateStatus(Util.stringToStatus(strStatus));
 		
 	}
 	
@@ -286,4 +336,7 @@ public class  UserCmd extends Subject implements IUserCmd{
 		this.status= Util.stringToStatus(stringStatus);
 		
 	}
+
+
+	
 }
