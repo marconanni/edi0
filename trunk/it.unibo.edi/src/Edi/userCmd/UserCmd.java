@@ -175,9 +175,9 @@ public class  UserCmd extends Subject implements IUserCmd{
 	 * @throws Exception
 	 */
 	protected IAcquireDemandReply userCmdDemand() throws Exception{
-		
+		showMsg(  "Sto per mandare ... " +M );	
 	IAcquireDemandReply answer = support.demand( "userCmd", "comandoUserCmd", M, "scontrol");
-	showMsg(  "has demanded ... " + "comandoUserCmd" );
+	showMsg(  "has demanded ... " +M+ "comandoUserCmd" );
 	return answer;
 		}
 	

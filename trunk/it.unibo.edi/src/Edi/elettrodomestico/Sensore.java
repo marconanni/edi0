@@ -89,7 +89,7 @@ public class  Sensore extends Subject implements ISensore{
 				this.sendData();				
 			}
 			try {
-				wait(this.intervalloInvio);
+				sleep(this.intervalloInvio);
 			} catch (InterruptedException e) {
 				
 				e.printStackTrace();

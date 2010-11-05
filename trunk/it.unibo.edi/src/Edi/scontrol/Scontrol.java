@@ -249,10 +249,12 @@ public class  Scontrol extends Subject implements IObserver, IScontrol{
 	/**
 	 * provvede a riattivare l'elettrodomestico indicato: chiama accendiElettrodomestico sull'eletrodomesticoIndicato
 	 * e cambia lo stato dell'elettrodomestico in avvio (secondo la logica attuale la riattivazione è di fatto una accensione). 
+	 * unica cosa in più: riazzera il consumo dell'elettrodomestrico.
 	 * NON PROVVEDE AD INVIARE LO STATO AGGIORNATO A SCONTROL
 	 * @param idElettrodomestico: l'id dell'elettrodomestico da riattivare
 	 */
 	private void riattivaElettrodomestico (String idElettrodomestico){
+		this.elettrodomestici.get(idElettrodomestico).setConsumo(0);
 		this.accendiElettrodomestico(idElettrodomestico);
 		
 	}
@@ -494,6 +496,7 @@ public class  Scontrol extends Subject implements IObserver, IScontrol{
 	protected IMessageAndContext scontrolGrant() throws Exception{
 	IMessageAndContext m = support.grant( "scontrol" ,  "comandoUserCmd"  );
 		showMessage( "acquired", m.getReceivedMessage() ) ;
+		System.out.println( "contenutoMessaggio"+ m.getReceivedMessage().msgContent() ) ;
 		return m;
 	}
 	protected IMessage scontrolSense() throws Exception{
@@ -524,6 +527,12 @@ public class  Scontrol extends Subject implements IObserver, IScontrol{
 				IRappresentazioneElettrodomestico elettrodomestico = elettrodomestici.get(datiSensore.getId());
 				// resetto il timer di sicurezza
 				this.timers.get(datiSensore.getId()).resetta();
+				// se è la prima volta che ricevo i dati di consumo mando lo stato aggiornato a userCmd,
+				// così l'utente sa quanto consuma l'elettrodomestico in fase di avvio. Se non lo facessi
+				// avrebbe la prossima comunicazione solo quando l'elettrodomestico entra in esercizio
+				if (elettrodomestico.getStato()==StatoElettrodomestico.avvio && elettrodomestico.getConsumo()==0){
+					userCmd.updateStatus(this.preparaStatus(""));
+				}
 				// se l'elettrodomestico era in accensione ed invia un consumo pari alla metà delleo scorso vuol dire che 
 				// è passato nella fase di esercizio. ciò significa che bisogna verificare se è necessario disattivare
 				// qualche elettrodomestico, qualora fosse necessario viene fatto e ne viene mandata comunicazione all'utente
@@ -700,6 +709,12 @@ public class  Scontrol extends Subject implements IObserver, IScontrol{
 			IRappresentazioneElettrodomestico elettrodomestico = elettrodomestici.get(datiSensore.getId());
 			// resetto il timer di sicurezza
 			this.timers.get(datiSensore.getId()).resetta();
+			// se è la prima volta che ricevo i dati di consumo mando lo stato aggiornato a userCmd,
+			// così l'utente sa quanto consuma l'elettrodomestico in fase di avvio. Se non lo facessi
+			// avrebbe la prossima comunicazione solo quando l'elettrodomestico entra in esercizio
+			if (elettrodomestico.getStato()==StatoElettrodomestico.avvio && elettrodomestico.getConsumo()==0){
+				userCmd.updateStatus(this.preparaStatus(""));
+			}
 			// se l'elettrodomestico era in accensione ed invia un consumo pari alla metà delleo scorso vuol dire che 
 			// è passato nella fase di esercizio. ciò significa che bisogna verificare se è necessario disattivare
 			// qualche elettrodomestico, qualora fosse necessario viene fatto e ne viene mandata comunicazione all'utente
