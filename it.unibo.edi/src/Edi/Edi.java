@@ -94,6 +94,13 @@ String pathname = "C:/Users/Marco/eclipseProjects/it.unibo.edi/ediConfig.txt";
 		// creo Scontrol
 		scontrol = Scontrol.getInstance(rappresentazioniElettrodomestici, soglia, intervalloSicurezza, interruttori, (UserCmd)userCmd);
 		
+		// configuro i nomi, così contact dovrebbe funzionare
+		userCmd.setName("Subject-userCmd");
+		scontrol.setName("Subject-scontrol");
+		for (Sensore sensore : sensori) {
+			sensore.setName("Subject-sensore");
+		}
+		
 	}
 
 	protected void start(){
