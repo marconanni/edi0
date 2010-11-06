@@ -23,7 +23,7 @@ private Vector<IElettrodomestico> elettrodomestici = new Vector<IElettrodomestic
 private Vector<IRappresentazioneElettrodomestico> rappresentazioniElettrodomestici = new Vector<IRappresentazioneElettrodomestico>();
 private Vector<Sensore> sensori = new Vector<Sensore>();
 
-String pathname = "C:/Users/Marco/eclipseProjects/it.unibo.edi/ediConfig.txt";
+String pathname = "C:/Tmp/edi/ediConfig.txt";
 
 	
 	public void doJob(){
@@ -117,15 +117,7 @@ String pathname = "C:/Users/Marco/eclipseProjects/it.unibo.edi/ediConfig.txt";
 			
 		}
 		
-		userCmd.connetti();
-		userCmd.accendiElettrodomestico("e1");
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		userCmd.disconnetti();
+		
  	}
 	
  	public static void main(String args[]) throws Exception {
