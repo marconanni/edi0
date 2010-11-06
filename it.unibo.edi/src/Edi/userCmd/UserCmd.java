@@ -185,7 +185,7 @@ public class  UserCmd extends Subject implements IUserCmd {
 		
 		IStatus nuovoStatus = scontrol.riceviEdElaboraComandoUserCmdFT(cmdString);
 		this.updateStatus(nuovoStatus);
-		System.out.println("***UserCmd: il nuovo stato è\n"+nuovoStatus);
+		
 	}
 	
 	/*
@@ -196,6 +196,7 @@ public class  UserCmd extends Subject implements IUserCmd {
 	public void updateStatus(IStatus status){
 		this.status=status;
 		this.notifiyGui(status);
+		System.out.println("UserCmd:Ricevuto aggiornamento Status\n"+ status);
 	}
 	//if userCmd must handle request or response
 	/**

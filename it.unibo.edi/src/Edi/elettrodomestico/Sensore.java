@@ -60,7 +60,7 @@ public class  Sensore extends Subject implements ISensore{
 //		} 
 //		catch( Exception e ){System.err.println("Errore in Sensore");e.printStackTrace();}
 		
-		scontrol.riceviDatiSensoreFT(Util.datiSensoreToString(datiSensore));
+		scontrol.riceviDatiSensoreSC(Util.datiSensoreToString(datiSensore));
 	}
 	
 	/**
