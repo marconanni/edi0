@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Edi
+Bundle-SymbolicName: it.unibo.edi; singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: it.unibo.edi.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ it.unibo.is.interfaces;bundle-version="1.0.0",
+ it.unibo.platform.lindaLike;bundle-version="1.0.0",
+ it.unibo.platform.medcl;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
