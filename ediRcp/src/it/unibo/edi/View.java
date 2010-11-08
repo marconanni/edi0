@@ -8,6 +8,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -15,6 +16,8 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Layout;
+
 import com.swtdesigner.SWTResourceManager;
 import org.eclipse.swt.widgets.Text;
 
@@ -30,7 +33,7 @@ import org.eclipse.swt.events.MouseEvent;
 public class View extends ViewPart implements IGui  {
 	
 	
-	private Vector <StatoElettrodomestico> stati;
+	
 	private IUserCmd usercmd;
 	
 	public static final String ID = "it.unibo.edi.view";
@@ -52,11 +55,15 @@ public class View extends ViewPart implements IGui  {
 	private Label lblIndicazioneSogliaDiConsumo;
 	
 	private final int numPulsantiElettrodomestici =9;
+
+	
+	private IStatus provastatus;
 	
 	private final Color coloreAvvio = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_CYAN);
 	private final Color coloreEsercizio = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
 	private final Color coloreDisattivato = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_YELLOW);
 	private final Color coloreSpento = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+	private Composite parent;
  
 	
 	
@@ -83,10 +90,7 @@ public class View extends ViewPart implements IGui  {
 	private void configuraEAvvia(){
 		
 		
-		stati = new Vector<StatoElettrodomestico>();
-		for (int k = 0; k < this.numPulsantiElettrodomestici; k++) {
-				stati.add(StatoElettrodomestico.spento);		
-		}
+		
 		
 		// faccio caricare le impostazioni da file, creare e far partire gli oggetti da Edi
 		Edi edi = new Edi();
@@ -97,9 +101,7 @@ public class View extends ViewPart implements IGui  {
 		//  mi registro a userCmd
 		usercmd.addGui(this);
 		
-		// aggiorno la visibilità degli elementi del sistema ( in questo caso li nascondo, visto che non sono connesso)
 		
-		this.aggiornaVisibilità();
 	}
 	
 	/**
@@ -108,20 +110,20 @@ public class View extends ViewPart implements IGui  {
 	 */
 	private void aggiornaVisibilità(){
 		boolean connesso = usercmd.isConnesso();
-		// aggiorno la visibilità dei bottoni degli elettrodomestici
-		for (Button bottone : this.getBottoniElettrodomestici()) {
-			bottone.setVisible(connesso);
-		}
-		this.lblConsumo.setVisible(connesso);
-		this.lblIndicazioneConsumoComplessivo.setVisible(connesso);
-		this.lblIndicazioneSogliaDiConsumo.setVisible(connesso);
-		this.lblSoglia.setVisible(connesso);
-		this.txtComunicazione.setVisible(connesso);
+	
+		
 		
 		this.btnConnetti.setEnabled(!connesso);
 		this.btnDisconnetti.setEnabled(connesso);
 		
 		
+	}
+	
+	private void hideAndDisposeOldStatusControls(){
+		for (Button bottone : this.getBottoniElettrodomestici() ) {
+			if (bottone!=null)
+			bottone.setVisible(false);
+		}
 	}
 	
 	/**
@@ -132,39 +134,11 @@ public class View extends ViewPart implements IGui  {
 	 */
 	private void refresh(IStatus newStatus){
 		
-		for (int k = 0; k < this.getBottoniElettrodomestici().size(); k++) {
-			Button bottone = this.getBottoniElettrodomestici().get(k);
-			IReportElettrodomestico report = newStatus.getReports().get(k);
-			System.out.println(report.getIdElettrodomestico()+" ("+report.getConsumoAttuale()+")");
-			bottone.setText(report.getIdElettrodomestico());
-			if(report.getStato()== StatoElettrodomestico.avvio){
-				bottone.setBackground(this.coloreAvvio);
-				stati.remove(k);
-				stati.add(k,StatoElettrodomestico.avvio);
-			}
-			else if(report.getStato()== StatoElettrodomestico.esercizio){
-				bottone.setBackground(this.coloreEsercizio);
-				stati.remove(k);
-				stati.add(k,StatoElettrodomestico.esercizio);
-			}
-			else if(report.getStato()== StatoElettrodomestico.disattivato){
-				bottone.setBackground(this.coloreDisattivato);
-				stati.remove(k);
-				stati.add(k,StatoElettrodomestico.disattivato); 
-			}
-			else if(report.getStato()== StatoElettrodomestico.spento){
-				bottone.setBackground(this.coloreSpento);
-				stati.remove(k);
-				stati.add(k,StatoElettrodomestico.spento);
-			}
-			
-			
-		}// fine ciclo pulsanti
+		// vedi se mettere un metdo che fa la dispode dei vecchi oggetti
+		aggiornaVisibilità();
 		
-		this.lblConsumo.setText(String.valueOf(newStatus.getConsumoAttualeComplessivo()));
-		this.lblSoglia.setText(String.valueOf(newStatus.getSoglia()));
-		this.txtComunicazione.setText(newStatus.getComunicazione());
-		
+		hideAndDisposeOldStatusControls();
+		this.drawStatusControls(newStatus);
 		
 	}
 	
@@ -174,10 +148,16 @@ public class View extends ViewPart implements IGui  {
 	 * si aggiornano i controlli che hanno a che fare con lo status
 	 */
 	public void update(IStatus newStatus) {
+		this.provastatus = newStatus;
 		System.out.println("ricevutoStatus");
 		if(usercmd.isConnesso())
-			this.refresh(newStatus);
-		this.aggiornaVisibilità();
+			Display.getDefault().asyncExec(new Runnable() {
+				 		            public void run() {
+				 		            	refresh(provastatus);
+				  		            }
+				 		     });
+			
+//		this.aggiornaVisibilità();
 		
 	}
 	
@@ -231,8 +211,114 @@ public class View extends ViewPart implements IGui  {
 	
 	
 	
+	private Button createButtonFromReport(IReportElettrodomestico report,int x,int y, int width, int height){
+		Button bottone = new Button(parent,SWT.NONE);
+		bottone.setText(report.getIdElettrodomestico());
+		bottone.setBackground(getColorForStatus(report.getStato()));
+		bottone.setData(report);
+		bottone.setBounds(x, y, width, height);
+		return bottone;
+	}
 	
-	
+	private void drawStatusControls(IStatus status){
+		// creo i bottoni
+		btn1=createButtonFromReport(status.getReports().get(0), 172, 138, 52, 40);
+		btn2=createButtonFromReport(status.getReports().get(1), 230, 138, 52, 40);
+		btn3=createButtonFromReport(status.getReports().get(2), 288, 138, 52, 40);
+		btn4=createButtonFromReport(status.getReports().get(3), 172, 184, 52, 40);
+		btn5=createButtonFromReport(status.getReports().get(4), 230, 184, 52, 40);
+		btn6=createButtonFromReport(status.getReports().get(5), 288, 184, 52, 40);
+		btn7=createButtonFromReport(status.getReports().get(6), 172, 230, 52, 40);
+		btn8=createButtonFromReport(status.getReports().get(7), 230, 230, 52, 40);
+		btn9=createButtonFromReport(status.getReports().get(8), 288, 230, 52, 40);
+		
+		// collego gli handlers ai bottoni 
+		btn1.addMouseListener(new MouseAdapter() {
+		 	@Override
+		 	public void mouseDown(MouseEvent e) {
+		 		btnElettrodomesticoMouseDown(btn1);
+		 	}
+		 });
+		btn2.addMouseListener(new MouseAdapter() {
+		 	@Override
+		 	public void mouseDown(MouseEvent e) {
+		 		btnElettrodomesticoMouseDown(btn2);
+		 	}
+		 });
+		btn3.addMouseListener(new MouseAdapter() {
+		 	@Override
+		 	public void mouseDown(MouseEvent e) {
+		 		btnElettrodomesticoMouseDown(btn3);
+		 	}
+		 });
+		btn4.addMouseListener(new MouseAdapter() {
+		 	@Override
+		 	public void mouseDown(MouseEvent e) {
+		 		btnElettrodomesticoMouseDown(btn4);
+		 	}
+		 });
+		btn5.addMouseListener(new MouseAdapter() {
+		 	@Override
+		 	public void mouseDown(MouseEvent e) {
+		 		btnElettrodomesticoMouseDown(btn5);
+		 	}
+		 });
+		btn6.addMouseListener(new MouseAdapter() {
+		 	@Override
+		 	public void mouseDown(MouseEvent e) {
+		 		btnElettrodomesticoMouseDown(btn6);
+		 	}
+		 });
+		btn7.addMouseListener(new MouseAdapter() {
+		 	@Override
+		 	public void mouseDown(MouseEvent e) {
+		 		btnElettrodomesticoMouseDown(btn7);
+		 	}
+		 });
+		btn8.addMouseListener(new MouseAdapter() {
+		 	@Override
+		 	public void mouseDown(MouseEvent e) {
+		 		btnElettrodomesticoMouseDown(btn8);
+		 	}
+		 });
+		btn9.addMouseListener(new MouseAdapter() {
+		 	@Override
+		 	public void mouseDown(MouseEvent e) {
+		 		btnElettrodomesticoMouseDown(btn9);
+		 	}
+		 });
+		
+		
+		lblConsumo = new Label(parent, SWT.NONE);
+		lblConsumo.setFont(SWTResourceManager.getFont("Courier", 14, SWT.BOLD));
+		lblConsumo.setAlignment(SWT.RIGHT);
+		lblConsumo.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+		lblConsumo.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		lblConsumo.setBounds(172, 303, 60, 22);
+		lblConsumo.setText(String.valueOf(status.getConsumoAttualeComplessivo()));
+		
+		 lblIndicazioneConsumoComplessivo = new Label(parent, SWT.NONE);
+		lblIndicazioneConsumoComplessivo.setBounds(23, 304, 143, 22);
+		lblIndicazioneConsumoComplessivo.setText("Consumo Complessivo");
+		
+		 lblSoglia = new Label(parent, SWT.NONE);
+		lblSoglia.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		lblSoglia.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+		lblSoglia.setAlignment(SWT.RIGHT);
+		lblSoglia.setFont(SWTResourceManager.getFont("Courier", 14, SWT.BOLD));
+		lblSoglia.setBounds(379, 303, 60, 22);
+		lblSoglia.setText(String.valueOf(status.getSoglia()));
+		
+		 lblIndicazioneSogliaDiConsumo = new Label(parent, SWT.NONE);
+		lblIndicazioneSogliaDiConsumo.setBounds(259, 303, 114, 22);
+		lblIndicazioneSogliaDiConsumo.setText("Soglia di Consumo");
+		
+		txtComunicazione = new Text(parent, SWT.BORDER);
+		txtComunicazione.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtComunicazione.setText(status.getComunicazione());
+		txtComunicazione.setEditable(false);
+		txtComunicazione.setBounds(103, 354, 336, 70);
+	}
 	
 	
 	
@@ -280,6 +366,7 @@ public class View extends ViewPart implements IGui  {
 	 * it.
 	 */
 	public void createPartControl(Composite parent) {
+		this.parent = parent;
 		parent.setLayout(null);
 		
 		 btnConnetti = new Button(parent, SWT.NONE);
@@ -306,135 +393,20 @@ public class View extends ViewPart implements IGui  {
 		Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
 		separator.setBounds(10, 89, 574, 2);
 		
-		 btn1 = new Button(parent, SWT.NONE);
-		 btn1.addMouseListener(new MouseAdapter() {
-		 	@Override
-		 	public void mouseDown(MouseEvent e) {
-		 		btnElettrodomesticoMouseDown(0);
-		 	}
-		 });
-		btn1.setText("1");
-		btn1.setBounds(172, 138, 52, 40);
 		
 		
-		 btn2 = new Button(parent, SWT.NONE);
-		 btn2.addMouseListener(new MouseAdapter() {
-		 	@Override
-		 	public void mouseDown(MouseEvent e) {
-		 		btnElettrodomesticoMouseDown(1);
-		 	}
-		 });
-		btn2.setBounds(230, 138, 52, 40);
-		btn2.setText("2");
+		 
 		
-		 btn3 = new Button(parent, SWT.NONE);
-		 btn3.addMouseListener(new MouseAdapter() {
-		 	@Override
-		 	public void mouseDown(MouseEvent e) {
-		 		btnElettrodomesticoMouseDown(2);
-		 	}
-		 });
-		btn3.setBounds(288, 138, 52, 40);
-		btn3.setText("3");
+			this.configuraEAvvia();
+
 		
-		 btn4 = new Button(parent, SWT.NONE);
-		 btn4.addMouseListener(new MouseAdapter() {
-		 	@Override
-		 	public void mouseDown(MouseEvent e) {
-		 		btnElettrodomesticoMouseDown(3);
-		 	}
-		 });
-		btn4.setBounds(172, 184, 52, 40);
-		btn4.setText("4");
-		
-		 btn5 = new Button(parent, SWT.NONE);
-		 btn5.addMouseListener(new MouseAdapter() {
-		 	@Override
-		 	public void mouseDown(MouseEvent e) {
-		 		btnElettrodomesticoMouseDown(4);
-		 	}
-		 });
-		btn5.setBounds(230, 184, 52, 40);
-		btn5.setText("5");
-		
-		 btn6 = new Button(parent, SWT.NONE);
-		 btn6.addMouseListener(new MouseAdapter() {
-		 	@Override
-		 	public void mouseDown(MouseEvent e) {
-		 		btnElettrodomesticoMouseDown(5);
-		 	}
-		 });
-		btn6.setBounds(288, 184, 52, 40);
-		btn6.setText("6");
-		
-		 btn7 = new Button(parent, SWT.NONE);
-		 btn7.addMouseListener(new MouseAdapter() {
-		 	@Override
-		 	public void mouseDown(MouseEvent e) {
-		 		btnElettrodomesticoMouseDown(6);
-		 	}
-		 });
-		btn7.setBounds(172, 230, 52, 40);
-		btn7.setText("7");
-		
-		 btn8 = new Button(parent, SWT.NONE);
-		 btn8.addMouseListener(new MouseAdapter() {
-		 	@Override
-		 	public void mouseDown(MouseEvent e) {
-		 		btnElettrodomesticoMouseDown(7);
-		 	}
-		 });
-		btn8.setBounds(230, 230, 52, 40);
-		btn8.setText("8");
-		
-		 btn9 = new Button(parent, SWT.NONE);
-		 btn9.addMouseListener(new MouseAdapter() {
-		 	@Override
-		 	public void mouseDown(MouseEvent e) {
-		 		btnElettrodomesticoMouseDown(8);
-		 	}
-		 });
-		btn9.setBounds(288, 230, 52, 40);
-		btn9.setText("9");
-		
-		 lblConsumo = new Label(parent, SWT.NONE);
-		lblConsumo.setFont(SWTResourceManager.getFont("Courier", 14, SWT.BOLD));
-		lblConsumo.setAlignment(SWT.RIGHT);
-		lblConsumo.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
-		lblConsumo.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-		lblConsumo.setBounds(172, 303, 60, 22);
-		lblConsumo.setText("***");
-		
-		 lblIndicazioneConsumoComplessivo = new Label(parent, SWT.NONE);
-		lblIndicazioneConsumoComplessivo.setBounds(23, 304, 143, 22);
-		lblIndicazioneConsumoComplessivo.setText("Consumo Complessivo");
-		
-		 lblSoglia = new Label(parent, SWT.NONE);
-		lblSoglia.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-		lblSoglia.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
-		lblSoglia.setAlignment(SWT.RIGHT);
-		lblSoglia.setFont(SWTResourceManager.getFont("Courier", 14, SWT.BOLD));
-		lblSoglia.setBounds(379, 303, 60, 22);
-		lblSoglia.setText("***");
-		
-		 lblIndicazioneSogliaDiConsumo = new Label(parent, SWT.NONE);
-		lblIndicazioneSogliaDiConsumo.setBounds(259, 303, 114, 22);
-		lblIndicazioneSogliaDiConsumo.setText("Soglia di Consumo");
-		
-		txtComunicazione = new Text(parent, SWT.BORDER);
-		txtComunicazione.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		txtComunicazione.setText("some text");
-		txtComunicazione.setEditable(false);
-		txtComunicazione.setBounds(103, 354, 336, 70);
-		
-		this.configuraEAvvia();
-		
+	
 	}
 
-	protected void btnElettrodomesticoMouseDown(int index) {
-		StatoElettrodomestico stato = stati.get(index);
-		Button bottone = this.getBottoniElettrodomestici().get(index);
-		String idElettrodomestico =bottone.getText();
+	protected void btnElettrodomesticoMouseDown(Button bottone) {
+		IReportElettrodomestico report = (IReportElettrodomestico) bottone.getData();
+		StatoElettrodomestico stato = report.getStato();
+		String idElettrodomestico =report.getIdElettrodomestico();
 		if(stato == StatoElettrodomestico.spento)
 			usercmd.accendiElettrodomestico(idElettrodomestico);
 		else if(stato == StatoElettrodomestico.avvio||stato == StatoElettrodomestico.esercizio||stato == StatoElettrodomestico.disattivato)
