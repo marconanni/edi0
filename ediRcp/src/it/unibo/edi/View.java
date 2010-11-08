@@ -29,7 +29,7 @@ import org.eclipse.swt.events.MouseEvent;
 
 public class View extends ViewPart implements IGui  {
 	
-	private Vector<Button> bottoni;
+	
 	private Vector <StatoElettrodomestico> stati;
 	private IUserCmd usercmd;
 	
@@ -81,18 +81,7 @@ public class View extends ViewPart implements IGui  {
 	 *  
 	 */
 	private void configuraEAvvia(){
-		// raccolgo i pulsanti degli elettrodomestici nel vettore
 		
-		bottoni = new Vector<Button>();
-		bottoni.add(btn1);
-		bottoni.add(btn2);
-		bottoni.add(btn3);
-		bottoni.add(btn4);
-		bottoni.add(btn5);
-		bottoni.add(btn6);
-		bottoni.add(btn7);
-		bottoni.add(btn8);
-		bottoni.add(btn9);
 		
 		stati = new Vector<StatoElettrodomestico>();
 		for (int k = 0; k < this.numPulsantiElettrodomestici; k++) {
@@ -120,7 +109,7 @@ public class View extends ViewPart implements IGui  {
 	private void aggiornaVisibilità(){
 		boolean connesso = usercmd.isConnesso();
 		// aggiorno la visibilità dei bottoni degli elettrodomestici
-		for (Button bottone : bottoni) {
+		for (Button bottone : this.getBottoniElettrodomestici()) {
 			bottone.setVisible(connesso);
 		}
 		this.lblConsumo.setVisible(connesso);
@@ -143,11 +132,11 @@ public class View extends ViewPart implements IGui  {
 	 */
 	private void refresh(IStatus newStatus){
 		
-		for (int k = 0; k < bottoni.size(); k++) {
-			Button bottone = bottoni.get(k);
+		for (int k = 0; k < this.getBottoniElettrodomestici().size(); k++) {
+			Button bottone = this.getBottoniElettrodomestici().get(k);
 			IReportElettrodomestico report = newStatus.getReports().get(k);
 			System.out.println(report.getIdElettrodomestico()+" ("+report.getConsumoAttuale()+")");
-			bottone.setText(report.getIdElettrodomestico()+" ("+report.getConsumoAttuale()+")");
+			bottone.setText(report.getIdElettrodomestico());
 			if(report.getStato()== StatoElettrodomestico.avvio){
 				bottone.setBackground(this.coloreAvvio);
 				stati.remove(k);
@@ -208,9 +197,37 @@ public class View extends ViewPart implements IGui  {
 	}
 	
 	
+	/**
+	 * 
+	 * @return un vettore contentente tutti i bottoni degli elettrodomestici
+	 */
+	private Vector<Button> getBottoniElettrodomestici(){
+		Vector <Button> vettore = new Vector<Button>();
+		vettore.add(btn1);
+		vettore.add(btn2);
+		vettore.add(btn3);
+		vettore.add(btn4);
+		vettore.add(btn5);
+		vettore.add(btn6);
+		vettore.add(btn7);
+		vettore.add(btn8);
+		vettore.add(btn9);
+		return vettore;
+		
+	}
 	
-	
-	
+	private Color getColorForStatus(StatoElettrodomestico stato){
+		if (stato == StatoElettrodomestico.avvio)
+			return this.coloreAvvio;
+		if (stato == StatoElettrodomestico.disattivato)
+			return this.coloreDisattivato;
+		if (stato == StatoElettrodomestico.esercizio)
+			return this.coloreEsercizio;
+		if (stato == StatoElettrodomestico.spento)
+			return this.coloreSpento;
+		else 
+			return Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
+	}
 	
 	
 	
@@ -416,8 +433,8 @@ public class View extends ViewPart implements IGui  {
 
 	protected void btnElettrodomesticoMouseDown(int index) {
 		StatoElettrodomestico stato = stati.get(index);
-		Button bottone = bottoni.get(index);
-		String idElettrodomestico = this.getIdElettrodomesticoFromTextBottone(bottone.getText());
+		Button bottone = this.getBottoniElettrodomestici().get(index);
+		String idElettrodomestico =bottone.getText();
 		if(stato == StatoElettrodomestico.spento)
 			usercmd.accendiElettrodomestico(idElettrodomestico);
 		else if(stato == StatoElettrodomestico.avvio||stato == StatoElettrodomestico.esercizio||stato == StatoElettrodomestico.disattivato)
