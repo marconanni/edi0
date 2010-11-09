@@ -605,8 +605,8 @@ public class  Scontrol extends Subject implements IObserver, IScontrol{
 	// a userCmd
 	public void update(IResettableTimer safetyTimer, String idElettrodomestico) {
 		this.spegniElettrodomestico(idElettrodomestico);
-		this.preparaStatus("non si ricevevano comunicazioni sul consumo da più di 2 secondi dall'elettrodomestico "+idElettrodomestico+". L'elettrodomestico è stato spento per ragioni di sicurezza");
-		
+		IStatus newStatus =this.preparaStatus("non si ricevevano comunicazioni sul consumo da più di 2 secondi dall'elettrodomestico "+idElettrodomestico+". L'elettrodomestico è stato spento per ragioni di sicurezza");
+		userCmd.updateStatus(newStatus);
 	}
 	
 	
