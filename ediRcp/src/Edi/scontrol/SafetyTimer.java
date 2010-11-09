@@ -107,6 +107,7 @@ public class SafetyTimer extends Thread implements IResettableTimer {
 	
 	public void run(){
 		do {
+			this.setResettato(false);
 			try {
 				sleep(eventTime);
 			} catch (InterruptedException e) {
