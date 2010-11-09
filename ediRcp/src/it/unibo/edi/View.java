@@ -57,11 +57,11 @@ public class View extends ViewPart implements IGui  {
 	private final int numPulsantiElettrodomestici =9;
 
 	
-	private IStatus provastatus;
+	private IStatus status;
 	
-	private final Color coloreAvvio = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_CYAN);
+	private final Color coloreAvvio = Display.getCurrent().getSystemColor(SWT.COLOR_CYAN);
 	private final Color coloreEsercizio = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
-	private final Color coloreDisattivato = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_YELLOW);
+	private final Color coloreDisattivato = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
 	private final Color coloreSpento = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 	private Composite parent;
  
@@ -110,9 +110,15 @@ public class View extends ViewPart implements IGui  {
 	 */
 	private void aggiornaVisibilità(){
 		boolean connesso = usercmd.isConnesso();
+		System.out.println("Connesso ="+connesso);
 	
-		
-		
+		for (Button bottone : getBottoniElettrodomestici()) {
+			bottone.setVisible(connesso);
+		}
+		this.lblConsumo.setVisible(connesso);
+		this.lblIndicazioneConsumoComplessivo.setVisible(connesso);
+		this.lblIndicazioneSogliaDiConsumo.setVisible(connesso);
+		this.lblSoglia.setVisible(connesso);
 		this.btnConnetti.setEnabled(!connesso);
 		this.btnDisconnetti.setEnabled(connesso);
 		
@@ -124,6 +130,14 @@ public class View extends ViewPart implements IGui  {
 			if (bottone!=null)
 			bottone.setVisible(false);
 		}
+		
+		if (lblConsumo!=null)
+			lblConsumo.setVisible(false);
+		if (lblSoglia!=null)
+			lblSoglia.setVisible(false);
+		if (txtComunicazione!=null)
+			txtComunicazione.setVisible(false);
+			
 	}
 	
 	/**
@@ -134,12 +148,13 @@ public class View extends ViewPart implements IGui  {
 	 */
 	private void refresh(IStatus newStatus){
 		
-		// vedi se mettere un metdo che fa la dispode dei vecchi oggetti
-		aggiornaVisibilità();
+		
+		
 		
 		hideAndDisposeOldStatusControls();
-		this.drawStatusControls(newStatus);
 		
+		this.drawStatusControls(newStatus);
+		aggiornaVisibilità();
 	}
 	
 	/**
@@ -148,12 +163,13 @@ public class View extends ViewPart implements IGui  {
 	 * si aggiornano i controlli che hanno a che fare con lo status
 	 */
 	public void update(IStatus newStatus) {
-		this.provastatus = newStatus;
+		this.status = newStatus;
 		System.out.println("ricevutoStatus");
-		if(usercmd.isConnesso())
+		
+		
 			Display.getDefault().asyncExec(new Runnable() {
 				 		            public void run() {
-				 		            	refresh(provastatus);
+				 		            	refresh(status);
 				  		            }
 				 		     });
 			
@@ -213,7 +229,7 @@ public class View extends ViewPart implements IGui  {
 	
 	private Button createButtonFromReport(IReportElettrodomestico report,int x,int y, int width, int height){
 		Button bottone = new Button(parent,SWT.NONE);
-		bottone.setText(report.getIdElettrodomestico());
+		bottone.setText(report.getIdElettrodomestico()+"  ("+report.getConsumoAttuale()+")");
 		bottone.setBackground(getColorForStatus(report.getStato()));
 		bottone.setData(report);
 		bottone.setBounds(x, y, width, height);
@@ -315,7 +331,7 @@ public class View extends ViewPart implements IGui  {
 		
 		txtComunicazione = new Text(parent, SWT.BORDER);
 		txtComunicazione.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		txtComunicazione.setText(status.getComunicazione());
+		txtComunicazione.append(status.getComunicazione());
 		txtComunicazione.setEditable(false);
 		txtComunicazione.setBounds(103, 354, 336, 70);
 	}
