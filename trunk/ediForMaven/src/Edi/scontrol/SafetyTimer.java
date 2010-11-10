@@ -37,49 +37,49 @@ public class SafetyTimer extends Thread implements IResettableTimer {
 		this.resettato = resettato;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see Edi.scontrol.IResettableTimer#getIdElettrodomestico()
 	 */
 	public String getIdElettrodomestico() {
 		return idElettrodomestico;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see Edi.scontrol.IResettableTimer#setIdElettrodomestico(java.lang.String)
 	 */
 	public void setIdElettrodomestico(String idElettrodomestico) {
 		this.idElettrodomestico = idElettrodomestico;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see Edi.scontrol.IResettableTimer#getEventTime()
 	 */
 	public long getEventTime() {
 		return eventTime;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see Edi.scontrol.IResettableTimer#setEventTime(int)
 	 */
 	public void setEventTime(long eventTime) {
 		this.eventTime = eventTime;
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see Edi.scontrol.IResettableTimer#addObserver(Edi.scontrol.IObserver)
 	 */
 	public void addObserver (IObserver observer){
 		observers.add(observer);
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see Edi.scontrol.IResettableTimer#removeObserver(Edi.scontrol.IObserver)
 	 */
 	public void removeObserver (IObserver observer){
 		observers.remove(observer);
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see Edi.scontrol.IResettableTimer#notifyObservers()
 	 */
 	public void notifyObservers(){

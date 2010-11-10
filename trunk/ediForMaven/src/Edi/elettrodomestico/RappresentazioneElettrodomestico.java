@@ -28,7 +28,7 @@ public class RappresentazioneElettrodomestico implements IRappresentazioneElettr
 	 * @param consumoAttuale: il consumo attuale dell'elettrodomestico ( se acceso  l'ultimo consumo registrato, se spento 0)
 	 * 						se l'elettrodomestico è disattivato contiene l'ultimo dato di consumo ricevuto
 	 * @param idInterruttore : l'identificativo dell'interruttore al quale l'elettrodomestcico è collegato
-	 * @param oraAccensione: l'ora dell'ultima accensione dell'elettrodomestico
+	 * @param oraAccensione: l'ora dell'ultima accensione dell'elettrodomestico, null se l'elettrodomestico è spento
 	 */
 	public RappresentazioneElettrodomestico(String id,
 			StatoElettrodomestico stato, int consumo,

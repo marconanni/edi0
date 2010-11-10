@@ -16,11 +16,10 @@ public interface IScontrol {
 	/**
 	 * provvede a spegnere l'elettrodomestico indicato: chiama turnOff sull' interruttore collegato allleletrodomesticoIndicato
 	 * e cambia lo stato dell'elettrodomestico in spento, azzerando il consumo attuale.
-	 * Infine si deregistra dal timer, in modo che  quando scatta non si riceve l'evento 
+	 * Infine fa in modo che il timer non gli invii nessuna notifica se, come ovvio, non si ricevono più dati dal sensore
 	 * NON PROVVEDE AD INVIARE LO STATO AGGIORNATO A SCONTROL
 	 * @param idElettrodomestico: l'id dell'elettrodomestico da spegnere
 	 */
-	// TODO:  vedi se c'è il modo di forzare la terminazione del thread in modo che l'evento non venga creato del tutto
 	public void spegniElettrodomestico(String idElettrodomestico);
 
 }

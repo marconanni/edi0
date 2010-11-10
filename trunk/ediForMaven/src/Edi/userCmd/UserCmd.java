@@ -38,13 +38,7 @@ public class  UserCmd extends Subject implements IUserCmd {
 		// le interfacce utente che si sono registrate 
 		private Vector<IGui> guis;
 		
-		// visto che contact non va ho bisogno di comunicare direttamente con scontrol
-		private Scontrol scontrol;
-				
-	
-	public void setScontrol(Scontrol scontrol) {
-			this.scontrol = scontrol;
-		}
+		
 
 
 	private UserCmd() {
@@ -54,7 +48,10 @@ public class  UserCmd extends Subject implements IUserCmd {
 			
 		}
 	
-	
+	/**
+	 * 
+	 * @return l'unica istanza di userCmd presente nel sistema (singleton)
+	 */
 	public static  IUserCmd getInstance(){
 		if (instance ==null){
 			instance = new UserCmd();
@@ -158,7 +155,6 @@ public class  UserCmd extends Subject implements IUserCmd {
 	 * lo impacchetta come request e la invia tramite il metodo userCmdDemand.
 	 * attende la risposta tramite UserCmdEvalResponse e, sempre grazie a questo metodo
 	 * aggiorna lo status. quest'ultima cosa viene fatta anche per il messaggio di disconnessione
-	 * è il metodo chiamante (disconnetti)che provvede a mettere correttamente lo status a null.
 	 * @param cmd il comando da inviare vedi {@link ComandiUserCmd}
 	 * @param idElettrodomestico l'id dell'elettrodomestico da inviare
 	 */
@@ -166,35 +162,30 @@ public class  UserCmd extends Subject implements IUserCmd {
 		ComandoUserCmd comando = new ComandoUserCmd(cmd, idElettrodomestico);
 		String cmdString = Util.comandoUserCmdToString(comando);
 		System.out.println("*****Inviato comando: "+cmdString);
-		/*
-		 * visto che contact non funziona ho commentato il codice sotto
-		 * ora  chiamo direttamente il metodo riceviEdElaboraComandoUserCmdFT di Scontrol
-		 * e aggiorno lo staus
-		 */
-//		// impacchetto il messaggio per contact
-//		this.M=cmdString;
-//		// invio messaggio e ricezione della risposta. 
-//		// nota evalResponse aggiorna lo status
-//		try {
-//			IAcquireDemandReply m = userCmdDemand();
-//			evalResponse( m );
-//			System.out.println("*****ricevuto Status : "+status);
-//		} catch (Exception e) {
-//			System.err.println("problemi nell'invio del messaggio: "+cmdString+" a Scontrol");
-//			e.printStackTrace();
-//		}
 		
-		IStatus nuovoStatus = scontrol.riceviEdElaboraComandoUserCmdFT(cmdString);
-		this.updateStatus(nuovoStatus);
+		// impacchetto il messaggio per contact
+		this.M=cmdString;
+		// invio messaggio e ricezione della risposta. 
+		// nota evalResponse aggiorna lo status
+		try {
+			IAcquireDemandReply m = userCmdDemand();
+			evalResponse( m );
+			System.out.println("*****ricevuto Status : "+status);
+		} catch (Exception e) {
+			System.err.println("problemi nell'invio del messaggio: "+cmdString+" a Scontrol");
+			e.printStackTrace();
+		}
+		
+		
 		
 	}
 	
-	/*
-	 * visto che l'invitation non funziona, scontrol invoca direttamente questo metodo
-	 * quando vuole comunicare spontaneamente un nuovo stato del sistema ( ad esempio perchè è stato 
-	 * disattivato un elettrodomestico) a usercmd
+	/**
+	 * metodo che permette di aggiornare lo stato del sistema, dandone notizia 
+	 * a tutte le gui registrate
+	 * @param status il nuovo stato del sistema 
 	 */
-	public void updateStatus(IStatus status){
+	private void updateStatus(IStatus status){
 		this.status=status;
 		this.notifiyGui(status);
 		System.out.println("UserCmd:Ricevuto aggiornamento Status\n"+ status);
@@ -247,6 +238,11 @@ public class  UserCmd extends Subject implements IUserCmd {
 	
 	
 //Local body of the subject
+	/**
+	 * corpo dell'esecuizione di userCmd: se connesso si mette in attesa
+	 * di eventuali aggiornamenti sullo stato del sistema e, quando arrivano
+	 * provvede ad aggiornare il suo campo status
+	 */
 	protected void doJob(){
 	try{
  		
@@ -260,16 +256,16 @@ public class  UserCmd extends Subject implements IUserCmd {
 		// operazioni vere: se sono connesso aspetto eventuali messaggi di aggiornamento delllo
 		// stato del sistema da Scontrol, e aggiorno lo status
 		// è commentato visto che non vanno le invitation di contact.
-//		while(true){
-//			if(this.isConnesso()){
-//				IMessage m = userCmdAccept();
-//				showMessage("ricevuto messaggio ", m);
-//				String strStatus= m.msgContent();
-//				showMsg("nuovoStato: "+strStatus);
-//				// aggioro lo stato
-//				this.status=Util.stringToStatus(strStatus);
-//			}
-//		}
+		while(true){
+			if(this.isConnesso()){
+				IMessage m = userCmdAccept();
+				showMessage("ricevuto messaggio ", m);
+				String strStatus= m.msgContent();
+				showMsg("nuovoStato: "+strStatus);
+				// aggioro lo stato
+				this.updateStatus(Util.stringToStatus(strStatus));
+			}
+		}
 
 
 

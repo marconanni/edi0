@@ -89,14 +89,13 @@ public interface IElettrodomestico {
 
 	/**
 	 * accende l'eletrodomestico: imposta l'ora di accensione, eventualmente sovrascrivendola
-	 * parte in fase di avvio poi lancia un thread che dopo 6 secondi cambia 
+	 * parte in fase di avvio poi, dopo 6 secondi, cambia 
 	 * lo stato in esercizio. 
 	 */
 	public void accendi();
 
 	/**
 	 * spegne l'elettrodomestico impostanto il suo stato a spento
-	 * lascia l'ora di accensione inalterata.
 	 */
 	public void spegni();
 
