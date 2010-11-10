@@ -1,0 +1,112 @@
+package Edi.messaggi;
+import java.util.Vector;
+
+
+/**
+ * 
+ * @author Marco
+ *	classe che rappresenta lo stato complessivo di un sistema e viene mandata da Scontrol a UserCmd
+ * affinchè lo stato venga visualizzato all'utente finale.
+ */
+public class Status implements IStatus {
+	
+	private String comunicazione;
+	private int consumoAttualeComplessivo;
+	private Vector<IReportElettrodomestico> reports;
+	private int soglia;
+	
+	/**
+	 * 
+	 * @param comunicazione : un'eventuale messaggio testuale da mandare a UserCmd ( e quindi all'utente)
+	 * @param reports:  un Vector di Report degli elettrodomestici presenti nel sistema vedi {@link IReportElettrodomestico} e {@link ReportElettrodomestico}
+	 * @param soglia: la soglia di consumo massimo del sistema.
+	 * il costruttore inizializza il consumoAttualeComplessivo sommando i consumi attuali di tutti gli elettrodomestici
+	 * 
+	 */
+	public Status(String comunicazione, 
+			Vector<IReportElettrodomestico> reports, int soglia) {
+		super();
+		this.comunicazione = comunicazione;
+		this.reports = reports;
+		this.soglia = soglia;
+		consumoAttualeComplessivo=0;
+		
+		for (int k =0; k<reports.size();k++){
+			consumoAttualeComplessivo = consumoAttualeComplessivo + reports.get(k).getConsumoAttuale();
+			
+		}
+		
+		
+	}
+
+	/**
+	 * @see Edi.messaggi.IStatus#getComunicazione()
+	 */
+	public String getComunicazione() {
+		return comunicazione;
+	}
+
+	/**
+	 * @see Edi.messaggi.IStatus#getConsumoAttualeComplessivo()
+	 */
+	public int getConsumoAttualeComplessivo() {
+		return consumoAttualeComplessivo;
+	}
+
+	/**
+	 * @see Edi.messaggi.IStatus#getReports()
+	 */
+	public Vector<IReportElettrodomestico> getReports() {
+		return reports;
+	}
+
+	/**
+	 * @see Edi.messaggi.IStatus#getSoglia()
+	 */
+	public int getSoglia() {
+		return soglia;
+	}
+
+	@Override
+	public String toString() {
+		return "Status [comunicazione=" + comunicazione
+				+ ", consumoAttualeComplessivo=" + consumoAttualeComplessivo
+				+ ", reports=" + reports + ", soglia=" + soglia + "]";
+	}
+
+	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Status other = (Status) obj;
+		if (comunicazione == null) {
+			if (other.comunicazione != null)
+				return false;
+		} else if (!comunicazione.equals(other.comunicazione))
+			return false;
+		if (consumoAttualeComplessivo != other.consumoAttualeComplessivo)
+			return false;
+		if (reports == null) {
+			if (other.reports != null)
+				return false;
+		} else if (!reports.equals(other.reports))
+			return false;
+		if (soglia != other.soglia)
+			return false;
+		return true;
+	}
+	
+	
+	
+	
+	
+	
+	
+
+}
