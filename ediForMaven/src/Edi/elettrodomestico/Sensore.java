@@ -23,12 +23,9 @@ public class  Sensore extends Subject implements ISensore{
 		private long intervalloInvio;
 		private IElettrodomestico elettrodomestico;
 		
-		// visto che contact non funziona
-		private Scontrol scontrol;
 		
-		public void setScontrol (Scontrol scontrol){
-			this.scontrol= scontrol;
-		}
+		
+		
 	
 	
 		
@@ -54,13 +51,13 @@ public class  Sensore extends Subject implements ISensore{
 		 * commentato visto che contact non fuziona viene eseguito il codice sotto che invoca direttamente
 		 * i metodi di Scontrol
 		 */
-//		M= Util.datiSensoreToString(datiSensore);
-//		try {
-//			this.sensoreEmit();
-//		} 
-//		catch( Exception e ){System.err.println("Errore in Sensore");e.printStackTrace();}
+		M= Util.datiSensoreToString(datiSensore);
+		try {
+			this.sensoreEmit();
+		} 
+		catch( Exception e ){System.err.println("Errore in Sensore");e.printStackTrace();}
 		
-		scontrol.riceviDatiSensoreSC(Util.datiSensoreToString(datiSensore));
+		
 	}
 	
 	/**

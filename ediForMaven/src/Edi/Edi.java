@@ -92,12 +92,9 @@ String pathname = "C:/Tmp/edi/ediConfig.txt";
 		
 		this.userCmd =  (UserCmd)UserCmd.getInstance();
 		// creo Scontrol
-		scontrol = Scontrol.getInstance(rappresentazioniElettrodomestici, soglia, intervalloSicurezza, interruttori, (UserCmd)userCmd);
+		scontrol = (Scontrol) Scontrol.getInstance(rappresentazioniElettrodomestici, soglia, intervalloSicurezza, interruttori);
 		
-		for (Sensore sensore : sensori) {
-			sensore.setScontrol(scontrol);
-			
-		}
+		
 		
 		
 		// configuro i nomi, anche se contact non funziona comunque

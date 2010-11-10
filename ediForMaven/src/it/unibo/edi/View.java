@@ -3,12 +3,10 @@ package it.unibo.edi;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -16,8 +14,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Layout;
-
 import com.swtdesigner.SWTResourceManager;
 import org.eclipse.swt.widgets.Text;
 
@@ -54,9 +50,6 @@ public class View extends ViewPart implements IGui  {
 	private Label lblSoglia;
 	private Label lblIndicazioneSogliaDiConsumo;
 	
-	private final int numPulsantiElettrodomestici =9;
-
-	
 	private IStatus status;
 	
 	private final Color coloreAvvio = Display.getCurrent().getSystemColor(SWT.COLOR_CYAN);
@@ -71,20 +64,13 @@ public class View extends ViewPart implements IGui  {
 	}
 	
 	/**
-	 * Questo metodo esegue la configurazione iniziale del sistema, per la parte che non è stata
-	 * generata automaticamente e viene chiamato esclusivamente da createPartControl.
-	 * In paritcolare raccoglie i 9 pulsanti degli elettrodomestici nel vettore bottoni,
-	 * inizializza il vettore accesi (che, ha un elementro true per ogni elettrodomestico acceso)
-	 * con nove valori a false;
-	 * 
+	 * Questo metodo esegue la configurazione iniziale del sistema
 	 * chiama il metodo doJob della classe Edi, che, caricando il file di configurazione, crea
 	 * tutti gli oggetti della businness logic, li configura e fa partire i processi dei sensori, di Scontrol 
 	 * e di Usercmd;
 	 * 
 	 * ottiene un riferimento a userCmd e si registra come observer per ottnere lo status aggiornato;
 	 * 
-	 * chiama il metodo aggiornaVisibilità per nscondere (visto che nel momento in cui configuraEAvvia viene invocato
-	 * UserCmd non  è connessa) tutti i controlli tranne i due pulsanti di connessione e disconnessione.
 	 *  
 	 */
 	private void configuraEAvvia(){
@@ -125,7 +111,12 @@ public class View extends ViewPart implements IGui  {
 		
 	}
 	
-	private void hideAndDisposeOldStatusControls(){
+	/**
+	 * provvede a nascondere i vecchi controlli relativi allo stato del sitema
+	 * (i bottoni degli eletrtrodomestici, la casella di testo con la cumunicazioni
+	 * e le due labels riguardanti consumo e soglia) in modo che le nuove siano visibili
+	 */
+	private void hideOldStatusControls(){
 		for (Button bottone : this.getBottoniElettrodomestici() ) {
 			if (bottone!=null)
 			bottone.setVisible(false);
@@ -142,16 +133,18 @@ public class View extends ViewPart implements IGui  {
 	
 	/**
 	 * metodo che aggiorna i controlli sulla base del nuovo status
-	 * in particolare per ogni pulsante ne aggiorna il testo con il nome dell'elettrodomestico
-	 * e sotto il consumo, ne cambia il colore in base allo stao: rosso>spento, verde>esercizio, azzurro>avvio, arancione>disattivato.
-	 * aggiorna le etichette di consumoComplessivo e soglia e mette nella casella di testo l'eventuale comunicazione
+	 * nasconde  i vecchi controlli, 
+	 * ne disegna dei nuovi sulla base del nuovo stato del sistema
+	 * e aggiorna la visibilità dei controlli stessi, nascondendoli in caso
+	 * di disconnessione
+	 * 	 
 	 */
 	private void refresh(IStatus newStatus){
 		
 		
 		
 		
-		hideAndDisposeOldStatusControls();
+		hideOldStatusControls();
 		
 		this.drawStatusControls(newStatus);
 		aggiornaVisibilità();
@@ -159,8 +152,7 @@ public class View extends ViewPart implements IGui  {
 	
 	/**
 	 * metodo che invoca usercmd quando riceve un nuovo status.
-	 * si aggiornano le visibilità dei controlli e, se si è connessi
-	 * si aggiornano i controlli che hanno a che fare con lo status
+	 * si esegue il metodo refresh	
 	 */
 	public void update(IStatus newStatus) {
 		this.status = newStatus;
@@ -173,24 +165,10 @@ public class View extends ViewPart implements IGui  {
 				  		            }
 				 		     });
 			
-//		this.aggiornaVisibilità();
+
 		
 	}
 	
-	/**
-	 * 
-	 * i pulanti hanno nel testo l'identificativo dell'elettrodomestico e ,dopo un a capo li consumo tra parentesi
-	 * è utile reperire l'id dell'elettrodomestico dal testo del pulsante,
-	 * questo metodo fa proprio questo.
-	 * 
-	 * @param textBottone il testo del bottone da cui estrrre l'identificativo dell'elettrodomestico.
-	 * il testo del bottone deve essere una stringa tipo "id\n(consumo)"
-	 * @return l'identificativo dell'elettrodomestico
-	 */
-	private String getIdElettrodomesticoFromTextBottone(String textBottone){
-		String idElettrodomestico = textBottone.substring(0, textBottone.indexOf(" "));
-		return idElettrodomestico;
-	}
 	
 	
 	/**
@@ -212,6 +190,11 @@ public class View extends ViewPart implements IGui  {
 		
 	}
 	
+	/**
+	 * 
+	 * @param stato lo stato di cui si vuole il colore corrispondente
+	 * @return il colore corrispondente allo stato passato per parametro
+	 */
 	private Color getColorForStatus(StatoElettrodomestico stato){
 		if (stato == StatoElettrodomestico.avvio)
 			return this.coloreAvvio;
@@ -226,7 +209,18 @@ public class View extends ViewPart implements IGui  {
 	}
 	
 	
-	
+	/**
+	 * metodo che consente di creare un bottone legato ad un elettrodomestico 
+	 * sulla base del report passato da parametro: provvede, inotrle ad iserire
+	 * il report nel campo data del bottone
+	 * NOTA: il pulsante non registra alcunchè a nessuno dei suoi eventi
+	 * @param report il report dell'elettrodomestico che si vuole sia collegato al bottone
+	 * @param x la coordinata x dell'angolo in alto a sx di dove di vuole disegnare l'elettrodomestico
+	 * @param y la coordinata x dell'angolo in alto a sx di dove di vuole disegnare l'elettrodomestico
+	 * @param width la larghezza del pulsante
+	 * @param height l'altezza del pulsante
+	 * @return un pulsante configurato sulla base dei parametri passati
+	 */
 	private Button createButtonFromReport(IReportElettrodomestico report,int x,int y, int width, int height){
 		Button bottone = new Button(parent,SWT.NONE);
 		bottone.setText(report.getIdElettrodomestico()+"  ("+report.getConsumoAttuale()+")");
@@ -236,6 +230,10 @@ public class View extends ViewPart implements IGui  {
 		return bottone;
 	}
 	
+	/**
+	 * metodo che permette di disegnare i controlli legati allo stato del sistema.
+	 * @param status
+	 */
 	private void drawStatusControls(IStatus status){
 		// creo i bottoni
 		btn1=createButtonFromReport(status.getReports().get(0), 172, 138, 52, 40);
@@ -419,6 +417,17 @@ public class View extends ViewPart implements IGui  {
 	
 	}
 
+	/**
+	 * metodo che viene eseguito quando si scatena un evento mouse down
+	 * su uno dei pulsanti collegati ad un elettrodomestico; provvede a 
+	 * reprerire il report collegato al pulante, da questo 
+	 * ne estrae lo stato e l'id dell'elettrodomestico e, in base a questi
+	 * manda chiama il metodo appropriato di userCmd.
+	 * in particolare se l'elettrodomestico è spento viene 
+	 * chiamato il metodo di accensione, per tutti gli altri stati
+	 * viene chiamato il metodo di spegnimento.
+	 * @param bottone il pulsante che ha generato l'evento
+	 */
 	protected void btnElettrodomesticoMouseDown(Button bottone) {
 		IReportElettrodomestico report = (IReportElettrodomestico) bottone.getData();
 		StatoElettrodomestico stato = report.getStato();
@@ -431,11 +440,19 @@ public class View extends ViewPart implements IGui  {
 		
 	}
 
+	/**
+	 * metodo che viene eseguito quando si fa click sul pusante
+	 * disconnetti. provvede a chiamare il metodo di disconnessione di userCmd
+	 */
 	protected void btnDisconnettiMouseDown() {
 		usercmd.disconnetti();
 		
 	}
 
+	/**
+	 * metodo che viene eseguito quando si fa click sul pusante
+	 * disconnetti. provvede a chiamare il metodo di disconnessione di userCmd
+	 */
 	protected void btnConnettiMouseDown() {
 		usercmd.connetti();
 		
