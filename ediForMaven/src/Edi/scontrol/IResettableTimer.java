@@ -58,5 +58,11 @@ public interface IResettableTimer {
 	 * fa partire il conto alla rovescia
 	 */
 	public void avvia();
+	
+	/**
+	 * annulla il conto alla rovescia: 
+	 * nessun evento verrà quindi lanciato
+	 */
+	public void interrompi();
 
 }
