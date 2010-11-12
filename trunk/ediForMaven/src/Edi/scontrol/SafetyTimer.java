@@ -105,6 +105,23 @@ public class SafetyTimer extends Thread implements IResettableTimer {
 		this.start();
 	}
 	
+	/**
+	 * @see Edi.scontrol.IResettableTimer#interrompi()
+	 */
+	
+	public void interrompi() {
+		try{
+			this.stop();
+		}
+		 catch (Exception e) {
+			;
+		}
+		 finally{
+			 ;
+		 }
+		
+	}
+	
 	public void run(){
 		do {
 			this.setResettato(false);
@@ -119,6 +136,8 @@ public class SafetyTimer extends Thread implements IResettableTimer {
 		// devo lanciare l'allarme
 		this.notifyObservers();
 	}
+
+	
 
 
 }
